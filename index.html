@@ -62,17 +62,15 @@
 <section id="home" class="section active pt-28 min-h-screen flex items-center">
     <div class="max-w-screen-2xl mx-auto px-8 text-center">
         <h1 class="text-7xl font-black neon">KIMO TECHNOLOGY</h1>
-        <p class="text-3xl mt-6">رشق حقيقي • فيديوهات AI • محفظة فودافون كاش • إعلانات ممولة</p>
+        <p class="text-3xl mt-6">رشق حقيقي • فيديوهات AI • محفظة فودافون كاش</p>
         <button onclick="navigateTo('smm')" class="mt-12 px-16 py-7 text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 rounded-3xl">ابدأ الرشق الآن</button>
     </div>
 </section>
 
-<!-- SMM SECTION - أسعار أعلى -->
+<!-- SMM -->
 <section id="smm" class="section py-24">
     <div class="max-w-screen-2xl mx-auto px-8">
-        <h2 class="text-6xl font-black neon text-center mb-4">خدمات الرشق (أسعار واقعية)</h2>
-        <p class="text-center text-cyan-400 mb-12">متصل بـ smmshark + أسعار مرتفعة للجودة</p>
-        
+        <h2 class="text-6xl font-black neon text-center mb-4">خدمات الرشق</h2>
         <div id="smmServicesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 </section>
@@ -136,15 +134,18 @@
 <!-- ADMIN PANEL -->
 <section id="admin-panel" class="section py-24 bg-black/80">
     <div class="max-w-screen-2xl mx-auto px-8">
-        <h2 class="text-6xl font-black flex items-center gap-4"><i class="fas fa-crown text-yellow-400"></i>لوحة الأدمن</h2>
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-6xl font-black flex items-center gap-4"><i class="fas fa-crown text-yellow-400"></i>لوحة الأدمن</h2>
+            <button onclick="loadAdminData()" class="px-8 py-4 bg-cyan-400 text-black rounded-3xl font-bold">تحديث الطلبات</button>
+        </div>
         
-        <div class="grid lg:grid-cols-2 gap-12 mt-12">
+        <div class="grid lg:grid-cols-2 gap-12">
             <div class="glass rounded-3xl p-12">
                 <h3 class="text-3xl mb-8">طلبات الشحن المعلقة</h3>
                 <div id="adminDeposits" class="space-y-6"></div>
             </div>
             <div class="glass rounded-3xl p-12">
-                <h3 class="text-3xl mb-8">الطلبات المعلقة (AI + إعلانات + SMM)</h3>
+                <h3 class="text-3xl mb-8">الطلبات المعلقة (رشق + AI + إعلانات)</h3>
                 <div id="adminOrders" class="space-y-6"></div>
             </div>
         </div>
@@ -180,7 +181,7 @@
 </div>
 
 <script>
-// ==================== FIREBASE ====================
+// ==================== FIREBASE CONFIG ====================
 const firebaseConfig = {
     apiKey: "AIzaSyB48E8FEkT2t_U9kUZYtWLJBxpCtMrAQZY",
     authDomain: "kimo-tecnology.firebaseapp.com",
@@ -196,36 +197,28 @@ const auth = firebase.auth();
 const db = firebase.database();
 
 let currentUser = null;
-
-// SMM API
-const SMM_API_KEY = "e088f64d263ce747d2dd50425d4bcdbf";
-const SMM_API_URL = "https://smmshark.com/api/v2";
-
-// أسعار واقعية وأعلى
-const fallbackServices = [
-    {service: 101, name: "Instagram Likes", category: "Instagram", rate: "12.50", min: 100, max: 500000},
-    {service: 102, name: "Instagram Followers", category: "Instagram", rate: "28.00", min: 50, max: 100000},
-    {service: 103, name: "Instagram Reel Views", category: "Instagram", rate: "9.00", min: 500, max: 1000000},
-    {service: 201, name: "TikTok Likes", category: "TikTok", rate: "15.00", min: 200, max: 300000},
-    {service: 202, name: "TikTok Followers", category: "TikTok", rate: "35.00", min: 100, max: 80000},
-    {service: 203, name: "TikTok Video Views", category: "TikTok", rate: "11.50", min: 1000, max: 2000000},
-    {service: 301, name: "Facebook Likes", category: "Facebook", rate: "18.00", min: 100, max: 150000},
-    {service: 302, name: "Facebook Page Followers", category: "Facebook", rate: "45.00", min: 50, max: 50000},
-    {service: 401, name: "YouTube Views", category: "YouTube", rate: "22.00", min: 500, max: 5000000}
-];
-
 let allServices = [];
 
-// Load SMM
+// Fallback services (أسعار واقعية)
+const fallbackServices = [
+    {service: 101, name: "Instagram Likes", category: "Instagram", rate: "12.50"},
+    {service: 102, name: "Instagram Followers", category: "Instagram", rate: "28.00"},
+    {service: 103, name: "Instagram Reel Views", category: "Instagram", rate: "9.00"},
+    {service: 201, name: "TikTok Likes", category: "TikTok", rate: "15.00"},
+    {service: 202, name: "TikTok Followers", category: "TikTok", rate: "35.00"},
+    {service: 203, name: "TikTok Views", category: "TikTok", rate: "11.50"}
+];
+
+// Load SMM Services
 async function loadSMMServices() {
     const container = document.getElementById('smmServicesContainer');
-    container.innerHTML = `<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-6xl"></i></div>`;
+    container.innerHTML = `<div class="col-span-full text-center py-20"><i class="fas fa-spinner fa-spin text-6xl text-cyan-400"></i></div>`;
     
     try {
-        const res = await fetch(SMM_API_URL, {
+        const res = await fetch('https://smmshark.com/api/v2', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({key: SMM_API_KEY, action: "services"})
+            body: JSON.stringify({key: "e088f64d263ce747d2dd50425d4bcdbf", action: "services"})
         });
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) allServices = data;
@@ -245,7 +238,7 @@ function renderSMMServices() {
         div.innerHTML = `
             <div class="text-cyan-400 text-sm">${s.category || 'عام'}</div>
             <h4 class="text-2xl font-bold my-6">${s.name}</h4>
-            <div class="flex justify-between">
+            <div class="flex justify-between items-end">
                 <div><span class="text-5xl font-black text-cyan-400">${s.rate}</span> ج / 1000</div>
                 <button onclick="event.stopImmediatePropagation(); showSMMModal(${s.service}, '${s.name}')" class="px-8 py-3 bg-cyan-400 text-black rounded-3xl font-bold">اطلب</button>
             </div>
@@ -256,7 +249,7 @@ function renderSMMServices() {
 
 function showSMMModal(id, name) {
     if (!currentUser) return alert("سجل دخول أولاً");
-    document.getElementById('smmModalTitle').innerHTML = `${name}<br><small>رقم الخدمة: ${id}</small>`;
+    document.getElementById('smmModalTitle').innerHTML = `${name}<br><small class="text-cyan-400">رقم الخدمة: ${id}</small>`;
     document.getElementById('smmModal').classList.remove('hidden');
     document.getElementById('smmModal').classList.add('flex');
 }
@@ -269,24 +262,24 @@ function hideSMMModal() {
 
 async function placeSMMOrder() {
     hideSMMModal();
-    const link = document.getElementById('smmLinkInput').value;
+    const link = document.getElementById('smmLinkInput').value.trim();
     const qty = document.getElementById('smmQtyInput').value;
     
-    // حفظ في Firebase للأدمن
-    if (currentUser) {
-        db.ref('orders').push({
-            userId: currentUser.uid,
-            email: currentUser.email,
-            type: 'smm',
-            service: 'SMM Service',
-            link: link,
-            quantity: qty,
-            status: 'pending',
-            timestamp: Date.now()
-        });
-    }
+    if (!currentUser || !link) return alert("خطأ في البيانات");
     
-    alert("✅ تم إرسال طلب الرشق للأدمن + smmshark");
+    // حفظ الطلب في Firebase
+    db.ref('orders').push({
+        userId: currentUser.uid,
+        email: currentUser.email,
+        type: 'smm',
+        serviceName: document.getElementById('smmModalTitle').textContent.split('\n')[0],
+        link: link,
+        quantity: qty,
+        status: 'pending',
+        timestamp: Date.now()
+    }).then(() => {
+        alert("✅ تم إرسال طلب الرشق للأدمن بنجاح");
+    });
 }
 
 // AI Order
@@ -301,7 +294,7 @@ function placeAIOrder() {
         status: 'pending',
         timestamp: Date.now()
     }).then(() => {
-        alert("✅ تم حفظ طلب الفيديو AI للأدمن");
+        alert("✅ تم إرسال طلب الفيديو AI للأدمن");
         navigateTo('dashboard');
     });
 }
@@ -318,7 +311,10 @@ function submitAdRequest() {
         phone: document.getElementById('adPhone').value,
         status: 'pending',
         timestamp: Date.now()
-    }).then(() => alert("✅ تم حفظ طلب الإعلان للأدمن"));
+    }).then(() => {
+        alert("✅ تم إرسال طلب الإعلان للأدمن");
+        navigateTo('dashboard');
+    });
 }
 
 // Deposit
@@ -349,43 +345,43 @@ function submitDeposit() {
     }).then(() => alert("✅ تم إرسال طلب الشحن للأدمن"));
 }
 
-// Admin Panel Functions
+// Admin Panel - Load Data
 function loadAdminData() {
     // Deposits
-    db.ref('deposits').orderByChild('status').equalTo('pending').on('value', snap => {
+    db.ref('deposits').orderByChild('status').equalTo('pending').once('value', snap => {
         const container = document.getElementById('adminDeposits');
         container.innerHTML = '';
         snap.forEach(child => {
             const d = child.val();
             const key = child.key;
-            const html = `
-                <div class="flex justify-between bg-white/10 p-6 rounded-3xl">
+            container.innerHTML += `
+                <div class="flex justify-between items-center bg-white/10 p-6 rounded-3xl mb-4">
                     <div>
-                        <div>${d.email}</div>
+                        <div class="font-bold">${d.email}</div>
                         <div class="text-emerald-400">${d.amount} ج.م</div>
                     </div>
                     <button onclick="approveDeposit('${key}', ${d.amount}, '${d.userId}')" class="px-8 py-3 bg-emerald-400 text-black rounded-3xl">قبول</button>
                 </div>`;
-            container.innerHTML += html;
         });
+        if (snap.numChildren() === 0) container.innerHTML = '<p class="text-gray-400">لا توجد طلبات شحن معلقة</p>';
     });
 
     // Orders
-    db.ref('orders').orderByChild('status').equalTo('pending').on('value', snap => {
+    db.ref('orders').orderByChild('status').equalTo('pending').once('value', snap => {
         const container = document.getElementById('adminOrders');
         container.innerHTML = '';
         snap.forEach(child => {
             const o = child.val();
             const key = child.key;
-            const html = `
-                <div class="flex justify-between bg-white/10 p-6 rounded-3xl">
+            container.innerHTML += `
+                <div class="flex justify-between items-center bg-white/10 p-6 rounded-3xl mb-4">
                     <div>
-                        <div>${o.email} - ${o.type}</div>
+                        <div class="font-bold">${o.email} - ${o.type}</div>
                     </div>
                     <button onclick="approveOrder('${key}')" class="px-8 py-3 bg-emerald-400 text-black rounded-3xl">قبول</button>
                 </div>`;
-            container.innerHTML += html;
         });
+        if (snap.numChildren() === 0) container.innerHTML = '<p class="text-gray-400">لا توجد طلبات معلقة</p>';
     });
 }
 
@@ -393,42 +389,32 @@ function approveDeposit(key, amount, userId) {
     db.ref('users/' + userId + '/balance').transaction(val => (val || 0) + amount);
     db.ref('deposits/' + key + '/status').set('approved');
     alert("✅ تم قبول الشحن وإضافة الرصيد");
+    loadAdminData();
 }
 
 function approveOrder(key) {
     db.ref('orders/' + key + '/status').set('approved');
     alert("✅ تم قبول الطلب");
+    loadAdminData();
 }
 
-// Auth & Balance
-auth.onAuthStateChanged(user => {
-    currentUser = user;
-    if (user) {
-        document.getElementById('authBtn').classList.add('hidden');
-        document.getElementById('logoutBtn').classList.remove('hidden');
-        document.getElementById('userPanel').classList.remove('hidden');
-        document.getElementById('userDisplayName').textContent = user.email.split('@')[0];
-        
-        // Create user balance if not exists
-        db.ref('users/' + user.uid).once('value', snap => {
-            if (!snap.exists()) {
-                db.ref('users/' + user.uid).set({ balance: 50, email: user.email });
-            }
-        });
-        
-        // Load balance
-        db.ref('users/' + user.uid + '/balance').on('value', snap => {
-            const bal = snap.val() || 0;
-            document.getElementById('balanceDisplay').textContent = bal;
-            document.getElementById('userBalanceDisplay').innerHTML = `${bal} ج.م`;
-        });
-        
-        if (user.email === "kareemwael0213@gmail.com") {
-            document.getElementById('adminBadge').classList.remove('hidden');
+// Navigation
+function navigateTo(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(section);
+    if (target) {
+        target.classList.add('active');
+        if (section === 'admin-panel' && currentUser && currentUser.email === "kareemwael0213@gmail.com") {
             loadAdminData();
         }
     }
-});
+}
+
+// Auth
+function showAuthModal() {
+    document.getElementById('authModal').classList.remove('hidden');
+    document.getElementById('authModal').classList.add('flex');
+}
 
 function performLogin() {
     const email = document.getElementById('loginEmail').value;
@@ -442,20 +428,31 @@ function logout() {
     auth.signOut();
 }
 
-function showAuthModal() {
-    document.getElementById('authModal').classList.remove('hidden');
-    document.getElementById('authModal').classList.add('flex');
-}
-
-function navigateTo(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-}
+auth.onAuthStateChanged(user => {
+    currentUser = user;
+    if (user) {
+        document.getElementById('authBtn').classList.add('hidden');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+        document.getElementById('userPanel').classList.remove('hidden');
+        document.getElementById('userDisplayName').textContent = user.email.split('@')[0];
+        
+        if (user.email === "kareemwael0213@gmail.com") {
+            document.getElementById('adminBadge').classList.remove('hidden');
+        }
+        
+        // Load user balance
+        db.ref('users/' + user.uid + '/balance').on('value', snap => {
+            const bal = snap.val() || 0;
+            document.getElementById('balanceDisplay').textContent = bal;
+            document.getElementById('userBalanceDisplay').innerHTML = `${bal} ج.م`;
+        });
+    }
+});
 
 window.onload = () => {
     loadSMMServices();
     navigateTo('home');
-    console.log('%c✅ Kimo Technology - تم الإصلاح الكامل (الرشق أغلى + الطلبات تصل للأدمن + الرصيد يشتغل)', 'color:#00f5ff;font-size:20px;font-weight:900');
+    console.log('%c✅ تم الإصلاح الكامل - كل الطلبات الآن تصل للأدمن', 'color:#00f5ff;font-size:20px;font-weight:900');
 };
 </script>
 </body>
