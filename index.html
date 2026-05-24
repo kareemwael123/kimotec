@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimo Technology - محفظة وخدمات AI</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --dark: #0a0a0a;
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+        }
+        .navbar { background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); }
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://picsum.photos/id/1015/2000/1200');
+            height: 100vh;
+            background-size: cover;
+        }
+        .card { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(0,212,255,0.2);
+            transition: all 0.3s;
+        }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,212,255,0.2); }
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            border: none;
+        }
+        .nav-link { color: #fff !important; }
+        .nav-link.active { color: var(--primary) !important; border-bottom: 3px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="#">Kimo <span style="color:#00d4ff">Technology</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('home')">الرئيسية</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('services')">الخدمات</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('wallet')">المحفظة</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('smm')">SMM</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('ads')">الإعلانات</a></li>
+                <li class="nav-item" id="loginBtn"><a class="nav-link" href="#" onclick="showAuthModal()">تسجيل الدخول</a></li>
+                <li class="nav-item d-none" id="userMenu">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+                            <span id="userName">حسابي</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" onclick="showSection('dashboard')">لوحة التحكم</a></li>
+                            <li><a class="dropdown-item" onclick="logout()">تسجيل خروج</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section id="home" class="hero d-flex align-items-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="display-3 fw-bold">Kimo Technology</h1>
+                <p class="lead fs-3">محفظة إلكترونية + خدمات AI فيديو + SMM + إعلانات ممولة</p>
+                <button class="btn btn-primary btn-lg px-5" onclick="showSection('services')">ابدأ الآن</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services -->
+<section id="services" class="py-5 d-none">
+    <div class="container">
+        <h2 class="text-center mb-5">خدماتنا</h2>
+        <div class="row g-4">
+            <!-- Video Services -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4">
+                    <h4><i class="fas fa-video text-info"></i> فيديوهات Grok / Veo</h4>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-3">
+                            <strong>Grok 10 ثانية</strong> - 10 جنيه
+                            <button class="btn btn-sm btn-primary float-end" onclick="orderVideo('grok10')">اطلب</button>
+                        </li>
+                        <li class="mb-3">
+                            <strong>Grok 6 ثانية</strong> - 6 جنيه
+                            <button class="btn btn-sm btn-primary float-end" onclick="orderVideo('grok6')">اطلب</button>
+                        </li>
+                        <li>
+                            <strong>Veo 3 - 8 ثانية</strong> - 8 جنيه
+                            <button class="btn btn-sm btn-primary float-end" onclick="orderVideo('veo8')">اطلب</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SMM -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4">
+                    <h4><i class="fas fa-heart text-danger"></i> زيادة تفاعل (SMM)</h4>
+                    <p>لايكات، مشاهدات، فولو غير حقيقي</p>
+                    <button class="btn btn-primary w-100" onclick="showSection('smm')">ابدأ طلب</button>
+                </div>
+            </div>
+
+            <!-- Ads -->
+            <div class="col-md-4">
+                <div class="card h-100 p-4">
+                    <h4><i class="fas fa-ad text-warning"></i> إعلانات فيسبوك ممولة</h4>
+                    <button class="btn btn-primary w-100" onclick="showSection('ads')">اطلب إعلان</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Wallet -->
+<section id="wallet" class="py-5 d-none">
+    <div class="container">
+        <h2 class="text-center mb-5">شحن المحفظة - Vodafone Cash</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card p-5 text-center">
+                    <h3>رقم Vodafone Cash</h3>
+                    <h1 class="text-success display-5 fw-bold">01112215950</h1>
+                    <p class="mt-4">حول المبلغ وأرسل لقطة شاشة + رقمك + المبلغ في نموذج التأكيد</p>
+                    <button class="btn btn-success btn-lg mt-4" onclick="showDepositForm()">تأكيد التحويل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard -->
+<section id="dashboard" class="py-5 d-none">
+    <div class="container">
+        <h2>لوحة التحكم</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-4">
+                    <h5>رصيدك</h5>
+                    <h2 id="balance">0 ج.م</h2>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h5>طلباتك المعلقة</h5>
+                <div id="pendingOrders"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SMM Section -->
+<section id="smm" class="py-5 d-none">
+    <div class="container">
+        <h2>SMM Panel - smmshark.com</h2>
+        <div class="card p-4">
+            <input type="text" id="smmLink" class="form-control mb-3" placeholder="رابط المنشور">
+            <select id="smmService" class="form-select mb-3">
+                <option value="likes">لايكات</option>
+                <option value="views">مشاهدات</option>
+                <option value="followers">فولو</option>
+            </select>
+            <input type="number" id="smmQuantity" class="form-control mb-3" placeholder="الكمية">
+            <button class="btn btn-primary" onclick="placeSMMOrder()">اطلب</button>
+        </div>
+    </div>
+</section>
+
+<!-- Ads Section -->
+<section id="ads" class="py-5 d-none">
+    <div class="container">
+        <h2>طلب إعلان ممول</h2>
+        <div class="card p-4">
+            <input type="text" id="adVideoLink" class="form-control mb-3" placeholder="رابط الفيديو">
+            <input type="number" id="adBudget" class="form-control mb-3" placeholder="الميزانية (جنيه)">
+            <input type="tel" id="adPhone" class="form-control mb-3" placeholder="رقم التواصل">
+            <button class="btn btn-primary" onclick="submitAdRequest()">إرسال للأدمن</button>
+        </div>
+    </div>
+</section>
+
+<!-- Auth Modal -->
+<div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authTitle">تسجيل الدخول</h5>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-4">
+                    <li class="nav-item"><a class="nav-link active" onclick="switchAuthTab(0)">دخول</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="switchAuthTab(1)">تسجيل</a></li>
+                </ul>
+                
+                <div id="loginForm">
+                    <input id="loginEmail" type="email" class="form-control mb-3" placeholder="الإيميل">
+                    <input id="loginPass" type="password" class="form-control mb-3" placeholder="كلمة السر">
+                    <button class="btn btn-primary w-100" onclick="login()">دخول</button>
+                    <button class="btn btn-outline-light w-100 mt-2" onclick="googleLogin()">
+                        <i class="fab fa-google"></i> دخول بجوجل
+                    </button>
+                </div>
+                
+                <div id="registerForm" class="d-none">
+                    <input id="regEmail" type="email" class="form-control mb-3" placeholder="الإيميل">
+                    <input id="regPass" type="password" class="form-control mb-3" placeholder="كلمة السر">
+                    <button class="btn btn-primary w-100" onclick="register()">تسجيل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deposit Modal -->
+<div class="modal fade" id="depositModal">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-body">
+                <h5>تأكيد التحويل</h5>
+                <input id="depAmount" type="number" class="form-control mb-3" placeholder="المبلغ">
+                <input id="depPhone" type="tel" class="form-control mb-3" placeholder="رقمك">
+                <textarea id="depNote" class="form-control" placeholder="ملاحظات"></textarea>
+                <button class="btn btn-success mt-3" onclick="submitDeposit()">إرسال للأدمن</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Firebase Config
+const firebaseConfig = {
+    apiKey: "AIzaSyB48E8FEkT2t_U9kUZYtWLJBxpCtMrAQZY",
+    authDomain: "kimo-tecnology.firebaseapp.com",
+    databaseURL: "https://kimo-tecnology-default-rtdb.firebaseio.com",
+    projectId: "kimo-tecnology",
+    storageBucket: "kimo-tecnology.firebasestorage.app",
+    messagingSenderId: "27878132504",
+    appId: "1:27878132504:web:5559659d4a2342747cac6d",
+    measurementId: "G-4P6L2GPWZV"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+// Global variables
+let currentUser = null;
+let isAdmin = false;
+
+// Show section
+function showSection(section) {
+    document.querySelectorAll('section').forEach(s => s.classList.add('d-none'));
+    document.getElementById(section).classList.remove('d-none');
+}
+
+// Auth
+function showAuthModal() {
+    new bootstrap.Modal(document.getElementById('authModal')).show();
+}
+
+function switchAuthTab(n) {
+    document.getElementById('loginForm').classList.toggle('d-none', n === 1);
+    document.getElementById('registerForm').classList.toggle('d-none', n === 0);
+}
+
+function register() {
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
+    
+    auth.createUserWithEmailAndPassword(email, pass)
+        .then(user => {
+            alert("تم التسجيل! يرجى تأكيد الإيميل");
+            user.user.sendEmailVerification();
+        })
+        .catch(err => alert(err.message));
+}
+
+function login() {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+    
+    auth.signInWithEmailAndPassword(email, pass)
+        .then(() => bootstrap.Modal.getInstance(document.getElementById('authModal')).hide())
+        .catch(err => alert(err.message));
+}
+
+function googleLogin() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+        .then(() => bootstrap.Modal.getInstance(document.getElementById('authModal')).hide())
+        .catch(err => alert(err.message));
+}
+
+function logout() {
+    auth.signOut();
+}
+
+// Deposit
+function showDepositForm() {
+    new bootstrap.Modal(document.getElementById('depositModal')).show();
+}
+
+function submitDeposit() {
+    if (!currentUser) return alert("يجب تسجيل الدخول");
+    
+    const amount = document.getElementById('depAmount').value;
+    const phone = document.getElementById('depPhone').value;
+    
+    db.ref('deposits').push({
+        userId: currentUser.uid,
+        amount: amount,
+        phone: phone,
+        status: 'pending',
+        timestamp: Date.now()
+    }).then(() => {
+        alert("تم إرسال طلب الشحن للأدمن");
+        bootstrap.Modal.getInstance(document.getElementById('depositModal')).hide();
+    });
+}
+
+// Video Order
+function orderVideo(type) {
+    if (!currentUser) return alert("سجل دخول أولاً");
+    
+    let price = type === 'grok10' ? 10 : type === 'grok6' ? 6 : 8;
+    let desc = type === 'grok10' ? 'Grok 10s' : type === 'grok6' ? 'Grok 6s' : 'Veo 8s';
+    
+    db.ref('orders').push({
+        userId: currentUser.uid,
+        type: 'video',
+        service: desc,
+        price: price,
+        status: 'pending',
+        timestamp: Date.now()
+    }).then(() => alert(`تم طلب ${desc} بنجاح - بانتظار التأكيد`));
+}
+
+// SMM Order
+function placeSMMOrder() {
+    if (!currentUser) return alert("سجل دخول");
+    
+    const link = document.getElementById('smmLink').value;
+    const service = document.getElementById('smmService').value;
+    const qty = document.getElementById('smmQuantity').value;
+    
+    // Simulate SMM API call to smmshark
+    fetch('https://smmshark.com/api/v2', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            key: "e088f64d263ce747d2dd50425d4bcdbf",
+            action: "add",
+            service: service,
+            link: link,
+            quantity: qty
+        })
+    }).then(r => r.json()).then(res => {
+        alert("تم الطلب على smmshark بنجاح! ID: " + (res.order || "تم"));
+    }).catch(() => alert("تم تسجيل الطلب"));
+}
+
+// Ad Request
+function submitAdRequest() {
+    if (!currentUser) return alert("سجل دخول");
+    
+    db.ref('adRequests').push({
+        userId: currentUser.uid,
+        video: document.getElementById('adVideoLink').value,
+        budget: document.getElementById('adBudget').value,
+        phone: document.getElementById('adPhone').value,
+        status: 'pending',
+        timestamp: Date.now()
+    }).then(() => alert("تم إرسال طلب الإعلان للأدمن"));
+}
+
+// Admin Check
+function checkAdmin(email) {
+    return email === "kareemwael0213@gmail.com";
+}
+
+// Listen to auth
+auth.onAuthStateChanged(user => {
+    currentUser = user;
+    if (user) {
+        document.getElementById('loginBtn').classList.add('d-none');
+        document.getElementById('userMenu').classList.remove('d-none');
+        document.getElementById('userName').textContent = user.email.split('@')[0];
+        
+        isAdmin = checkAdmin(user.email);
+        if (isAdmin) console.log("أنت الأدمن");
+        
+        showSection('dashboard');
+    }
+});
+
+// Bootstrap init
+document.addEventListener('DOMContentLoaded', () => {
+    showSection('home');
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
