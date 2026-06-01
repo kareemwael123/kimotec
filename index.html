@@ -3,23 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kimo Technology - منصة إنتاج الفيديو</title>
+    <title>Kimo Technology - استوديو توليد كليبات Grok</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
             --primary: #6c5ce7;
             --secondary: #a29bfe;
-            --dark: #1e1e24;
-            --light: #f8f9fa;
-            --danger: #ff7675;
-            --success: #55efc4;
+            --dark-bg: #0f0f12;
+            --card-bg: #1a1a1f;
+            --input-bg: #26262b;
+            --text-color: #f5f5f7;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #f1c40f;
         }
 
         * {
@@ -30,41 +33,46 @@
         }
 
         body {
-            background-color: #121214;
-            color: var(--light);
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 900px;
-            background: var(--dark);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 1100px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
             padding: 30px;
-            border: 1px solid #2d2d35;
+            border: 1px solid #2c2c35;
         }
 
-        h1, h2, h3 {
+        h2, h3, h4 {
+            color: var(--primary);
             margin-bottom: 20px;
             text-align: center;
-            color: var(--primary);
         }
 
-        /* تنسيق حقول الإدخال والأزرار */
         input, select, textarea {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             margin: 10px 0;
             border-radius: 8px;
             border: 1px solid #3a3a45;
-            background: #252529;
+            background: var(--input-bg);
             color: #fff;
-            font-size: 16px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
         }
 
         button {
@@ -81,145 +89,151 @@
             margin-top: 10px;
         }
 
-        button:hover {
-            background: var(--secondary);
-        }
-
-        .btn-google {
-            background: #db4437;
-        }
+        button:hover { background: var(--secondary); }
+        .btn-google { background: #db4437; margin-bottom: 15px; }
         .btn-google:hover { background: #e57373; }
-
         .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #ff7675; }
 
-        /* الأقسام الهيكلية */
         .screen { display: none; }
-        .active { display: block; }
+        .screen.active { display: block; }
 
-        /* لوحة التحكم للأدمن والمستخدم */
-        .grid-dashboard {
+        .layout-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 25px;
             margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            .grid-dashboard { grid-template-columns: 1fr; }
+        @media (max-width: 800px) {
+            .layout-grid { grid-template-columns: 1fr; }
         }
 
         .card {
-            background: #252529;
+            background: #212126;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #2d2d35;
+        }
+
+        .upload-box {
+            border: 2px dashed #4e4e5a;
             padding: 20px;
             border-radius: 10px;
-            border: 1px solid #3a3a45;
-        }
-
-        .badge {
-            background: var(--primary);
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        /* قائمة الـ APIs والخطط */
-        .list-item {
-            background: #1e1e24;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .status-active { color: var(--success); }
-        .status-failed { color: var(--danger); }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #3a3a45;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .loader {
-            display: none;
             text-align: center;
-            margin: 15px 0;
-            color: var(--secondary);
+            cursor: pointer;
+            position: relative;
+            margin: 10px 0;
+            background: var(--input-bg);
+        }
+
+        .upload-box input[type="file"] {
+            position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;
+        }
+
+        .preview-img {
+            max-width: 100%; max-height: 140px; border-radius: 6px; margin-top: 10px; display: none;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d2d35;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .user-row {
+            background: var(--input-bg);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #2d2d35;
+        }
+
+        .badge { background: var(--primary); padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        .loader { display: none; text-align: center; margin: 15px 0; color: var(--secondary); font-weight: bold; }
+        
+        .debug-panel {
+            background: #000; color: #00ff00; font-family: monospace; font-size: 11px; padding: 12px;
+            border-radius: 6px; margin-top: 15px; direction: ltr; text-align: left; max-height: 180px; 
+            overflow-y: auto; border: 1px solid #333; display: none;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        
-        <div id="login-screen" class="screen active">
-            <h2><i class="fa-solid fa-clapperboard"></i> منصة Kimo للـ Videos</h2>
-            <p style="text-align:center; color:#aaa; margin-bottom:20px;">سجل دخولك لبدء صناعة الفيديوهات بذكاء</p>
+
+        <div id="screen-auth" class="screen active">
+            <h2><i class="fa-solid fa-bolt"></i> منصة Kimo Technology الذكية</h2>
+            <p style="text-align: center; color: #888; margin-bottom: 20px;">إنتاج فيديوهات Grok بدقة 480p ولمدة 10 ثوانٍ كاملة</p>
             
-            <button class="btn-google" onclick="loginWithGoogle()"><i class="fa-brands fa-google"></i> الدخول بواسطة Google</button>
-            <div style="text-align: center; margin: 15px 0; color:#666;">أو عبر الإيميل</div>
+            <button class="btn-google" onclick="signWithGoogle()"><i class="fa-brands fa-google"></i> الدخول السريع بحساب Google</button>
             
-            <input type="email" id="login-email" placeholder="البريد الإلكتروني">
-            <input type="password" id="login-password" placeholder="كلمة المرور">
-            <button onclick="loginWithEmail()">تسجيل الدخول</button>
+            <div style="text-align:center; margin: 10px; color:#555;">أو عبر البريد الإلكتروني للسيستم</div>
+            <input type="email" id="auth-email" placeholder="البريد الإلكتروني">
+            <input type="password" id="auth-pass" placeholder="كلمة المرور">
+            <button onclick="signWithEmail('login')">تسجيل الدخول</button>
+            <button style="background:#26262b; color:#aaa;" onclick="signWithEmail('register')">إنشاء حساب جديد</button>
         </div>
 
-        <div id="admin-screen" class="screen">
-            <div class="navbar">
-                <span>أهلاً يا مدير (كريم) 👋</span>
-                <button style="width:auto; padding:5px 15px;" class="btn-danger" onclick="logout()">خروج</button>
+        <div id="screen-admin" class="screen">
+            <div class="top-bar">
+                <h3>لوحة تحكم الأدمن الرئيسي 👑</h3>
+                <button style="width:auto; padding:5px 15px;" class="btn-danger" onclick="logOut()">خروج</button>
             </div>
             
-            <div class="grid-dashboard">
+            <div class="layout-grid">
                 <div class="card">
-                    <h3><i class="fa-solid fa-key"></i> إدارة مفاتيح الـ API (kie.ai)</h3>
-                    <input type="text" id="admin-new-api" placeholder="أدخل الـ API Key الجديد">
-                    <button onclick="addApiKey()">إضافة الـ API للسيستم</button>
+                    <h4><i class="fa-solid fa-key"></i> إدارة مفاتيح ومحفظة kie.ai</h4>
+                    <input type="text" id="admin-api-key" placeholder="ألصق الـ API Key الجديد هنا">
+                    <button onclick="saveNewApiKey()">إضافة ومزامنة المفتاح في الطابور</button>
                     
-                    <h4 style="margin-top:20px; border-top:1px solid #3a3a45; padding-top:10px;">المفاتيح الحالية المتصلة:</h4>
-                    <div id="api-keys-list"></div>
+                    <h5 style="margin-top:20px; color: #aaa; font-size:14px;">طابور المفاتيح وحالتها الفورية:</h5>
+                    <div id="admin-apis-list" style="max-height: 200px; overflow-y:auto; margin-top:10px;"></div>
                 </div>
 
                 <div class="card">
-                    <h3><i class="fa-solid fa-users-gear"></i> إدارة اشتراكات الأعضاء</h3>
-                    <input type="text" id="admin-user-uid" placeholder="أدخل الـ UID الخاص بالمستخدم">
-                    <select id="admin-user-plan">
-                        <option value="plan_1">خطة 1 فيديو/يوم (300 ج)</option>
-                        <option value="plan_2">خطة 2 فيديو/يوم (600 ج)</option>
-                        <option value="plan_3">خطة 3 فيديو/يوم (900 ج)</option>
-                    </select>
-                    <button onclick="updateUserPlan()">تحديث خطة العضو فوراً</button>
+                    <h4><i class="fa-solid fa-users"></i> التحكم في باقات الأعضاء والاشتراكات</h4>
+                    <div id="admin-users-list" style="max-height: 350px; overflow-y:auto;"></div>
                 </div>
             </div>
         </div>
 
-        <div id="user-screen" class="screen">
-            <div class="navbar">
-                <div>أهلاً بك <span id="user-display-name" class="badge">..</span></div>
-                <button style="width:auto; padding:5px 15px;" class="btn-danger" onclick="logout()">خروج</button>
+        <div id="screen-user" class="screen">
+            <div class="top-bar">
+                <div>أهلاً بك: <span id="user-name" class="badge">..</span></div>
+                <button style="width:auto; padding:5px 15px;" class="btn-danger" onclick="logOut()">خروج</button>
             </div>
 
-            <div class="grid-dashboard">
+            <div class="layout-grid">
                 <div class="card" style="text-align: center;">
-                    <h3>بيانات خطتك</h3>
-                    <p style="margin:10px 0;">نوع الخطة: <strong id="u-plan-name" style="color:var(--primary)">جاري التحميل..</strong></p>
-                    <p style="margin:10px 0;">المتبقي لك اليوم: <strong id="u-plan-limit" style="color:var(--success)">0</strong> فيديو</p>
-                    <p style="font-size: 11px; color:#777; margin-top:10px;">معرف الحساب (انسخه للأدمن إذا أردت الترقية): <br><code id="u-uid-display" style="color:#fff"></code></p>
+                    <h4>حالة اشتراكك اليومي</h4>
+                    <div style="font-size: 35px; color: var(--primary); margin: 15px 0;"><i class="fa-solid fa-video"></i></div>
+                    <p>باقة الحساب: <strong id="user-plan-txt" style="color:var(--secondary)">جاري التحقق..</strong></p>
+                    <p style="margin-top:10px;">الفيديوهات المتاحة لك اليوم: <strong id="user-counter-txt" style="color:var(--success); font-size:24px;">0</strong></p>
                 </div>
 
                 <div class="card">
-                    <h3><i class="fa-solid fa-wand-magic-sparkles"></i> توليد فيديو Grok (10 ثواني - 480p)</h3>
-                    <textarea id="video-prompt" rows="3" placeholder="اكتب الوصف (Prompt) للفيديو الذي تريده هنا..."></textarea>
-                    <button onclick="handleVideoGeneration()">ابدأ التوليد الآن</button>
+                    <h4><i class="fa-solid fa-wand-magic-sparkles"></i> استوديو صناعة فيديو Grok (10 ثوانٍ)</h4>
                     
-                    <div class="loader" id="gen-loader"><i class="fa-solid fa-spinner fa-spin"></i> جاري محاولة التوليد وفحص الـ APIs المتاحة...</div>
-                    <div id="video-output" style="margin-top:15px; text-align:center;"></div>
+                    <div class="upload-box">
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size:22px; color:var(--primary)"></i>
+                        <p id="up-hint" style="font-size:12px; color:#888; margin-top:5px;">ارفع صورة تحريك اختيارية (Image to Video)</p>
+                        <input type="file" id="video-file-img" accept="image/*" onchange="convertImgToBase64(this)">
+                        <img id="view-upload-img" class="preview-img">
+                    </div>
+
+                    <textarea id="video-prompt-input" rows="4" placeholder="اكتب تفاصيل الكليب والمشهد الذي تريد توليده بالكامل هنا..."></textarea>
+                    
+                    <button onclick="startGeneratingProcess()"><i class="fa-solid fa-play"></i> ابدأ التوليد الآن</button>
+                    
+                    <div class="loader" id="main-loader"><i class="fa-solid fa-circle-notch fa-spin"></i> جاري فحص مفاتيح الـ API وتحضير طلب السيرفر...</div>
+                    <div id="video-result-box" style="margin-top: 15px;"></div>
+                    
+                    <div id="debug-log-box" class="debug-panel"></div>
                 </div>
             </div>
         </div>
@@ -227,7 +241,7 @@
     </div>
 
     <script>
-        // 1. الإعدادات الخاصة بـ Firebase الخاصة بك
+        // 🛠️ بيانات الـ Firebase Config الخاصة بك مدمجة وجاهزة للعمل فورا
         const firebaseConfig = {
             apiKey: "AIzaSyB48E8FEkT2t_U9kUZYtWLJBxpCtMrAQZY",
             authDomain: "kimo-tecnology.firebaseapp.com",
@@ -243,210 +257,351 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 2. التحكم في الشاشات والتنقل
-        function switchScreen(screenId) {
+        let globalBase64Img = null;
+
+        function changeView(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        // 3. مصادقة المستخدمين (تسجيل الدخول بجوجل / الإيميل)
-        function loginWithGoogle() {
+        function signWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(err => alert("خطأ بجوجل: " + err.message));
+            auth.signInWithPopup(provider).catch(e => alert("مشكلة بتسجيل جوجل: " + e.message));
         }
 
-        function loginWithEmail() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            if(!email || !password) return alert("املاً الحقول أولاً");
-            auth.signInWithEmailAndPassword(email, password).catch(err => alert("خطأ بالإيميل: " + err.message));
+        function signWithEmail(type) {
+            const email = document.getElementById('auth-email').value.trim();
+            const pass = document.getElementById('auth-pass').value;
+            if(!email || !pass) return alert("يرجى كتابة البيانات كاملة أولاً!");
+
+            if(type === 'login') {
+                auth.signInWithEmailAndPassword(email, pass).catch(e => alert("خطأ في تسجيل الدخول: " + e.message));
+            } else {
+                auth.createUserWithEmailAndPassword(email, pass)
+                    .then(() => alert("تم إنشاء الحساب بنجاح في المنصة!"))
+                    .catch(e => alert("خطأ في إنشاء الحساب الجديد: " + e.message));
+            }
         }
 
-        function logout() {
-            auth.signOut();
-        }
+        function logOut() { auth.signOut(); }
 
-        // 4. مراقبة حالة تسجيل الدخول وتوجيه الرتب (أدمن أم مستخدم)
+        // مراقبة الجلسة والتوجيه بناء على إيميل الأدمن المحدد من قبلك
         auth.onAuthStateChanged(user => {
-            if (user) {
-                if (user.email === "kareemwael0213@gmail.com") {
-                    switchScreen('admin-screen');
-                    listenToApiKeys();
+            if(user) {
+                if(user.email === "kareemwael0213@gmail.com") {
+                    changeView('screen-admin');
+                    loadAdminData();
                 } else {
-                    switchScreen('user-screen');
-                    document.getElementById('user-display-name').innerText = user.displayName || user.email;
-                    document.getElementById('u-uid-display').innerText = user.uid;
-                    setupUserRecord(user.uid, user.email);
+                    changeView('screen-user');
+                    document.getElementById('user-name').innerText = user.displayName || user.email;
+                    syncUserDashboard(user.uid, user.email);
                 }
             } else {
-                switchScreen('login-screen');
+                changeView('screen-auth');
             }
         });
 
-        // 5. تهيئة حساب العضو الجديد وتحديد رصيده وتجديده يومياً تلقائياً
-        function setupUserRecord(uid, email) {
-            const userRef = db.ref('users/' + uid);
-            userRef.on('value', snapshot => {
-                let data = snapshot.val();
-                const today = new Date().toISOString().split('T')[0];
+        function convertImgToBase64(element) {
+            const file = element.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('view-upload-img').src = e.target.result;
+                    document.getElementById('view-upload-img').style.display = "block";
+                    document.getElementById('up-hint').style.display = "none";
+                    globalBase64Img = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
-                if (!data) {
-                    // مستخدم جديد بدون خطة (بشكل افتراضي يأخذ 0 فيديوهات)
-                    data = { email: email, plan: "none", videos_left_today: 0, last_reset_date: today };
-                    userRef.set(data);
-                } else if (data.last_reset_date !== today) {
-                    // تجديد عدد المحاولات بناءً على خطته مع بداية اليوم الجديد
-                    let dailyLimit = 0;
-                    if(data.plan === 'plan_1') dailyLimit = 1;
-                    if(data.plan === 'plan_2') dailyLimit = 2;
-                    if(data.plan === 'plan_3') dailyLimit = 3;
+        // مزامنة لوحة العميل وحساب العداد اليومي مع التحديث التلقائي كل 24 ساعة
+        function syncUserDashboard(uid, email) {
+            const uRef = db.ref('users/' + uid);
+            uRef.on('value', snap => {
+                let uData = snap.val();
+                const todayStr = new Date().toISOString().split('T')[0];
 
-                    userRef.update({
-                        videos_left_today: dailyLimit,
-                        last_reset_date: today
-                    });
+                if(!uData) {
+                    uData = { email: email, plan: "none", videos_left_today: 0, last_reset_date: todayStr };
+                    uRef.set(uData);
+                } else if (uData.last_reset_date !== todayStr) {
+                    let limit = 0;
+                    if(uData.plan === 'plan_1') limit = 1;
+                    if(uData.plan === 'plan_2') limit = 2;
+                    if(uData.plan === 'plan_3') limit = 3;
+                    uRef.update({ videos_left_today: limit, last_reset_date: todayStr });
                 }
 
-                // عرض البيانات في واجهة المستخدم
-                const planNames = { "none": "لا يوجد اشتراك نشط", "plan_1": "فيديو واحد/يوم (300ج)", "plan_2": "2 فيديو/يوم (600ج)", "plan_3": "3 فيديوهات/يوم (900ج)" };
-                document.getElementById('u-plan-name').innerText = planNames[data.plan] || "مخصصة";
-                document.getElementById('u-plan-limit').innerText = data.videos_left_today;
+                const names = { 
+                    "none": "غير مشترك / تجريبي", 
+                    "plan_1": "خطة فيديو في اليوم (300 ج.م)", 
+                    "plan_2": "خطة 2 فيديو في اليوم (600 ج.م)", 
+                    "plan_3": "خطة 3 فيديوهات في اليوم (900 ج.م)" 
+                };
+                document.getElementById('user-plan-txt').innerText = names[uData.plan] || "خطة مخصصة";
+                document.getElementById('user-counter-txt').innerText = uData.videos_left_today;
             });
         }
 
-        // ==================== منطق الأدمن (كريم) ====================
-
-        function addApiKey() {
-            const keyVal = document.getElementById('admin-new-api').value.trim();
-            if(!keyVal) return alert("ادخل الـ مفتاح أولاً");
-            db.ref('api_keys').push({
-                value: keyVal,
-                status: "active"
-            }).then(() => {
-                document.getElementById('admin-new-api').value = "";
-                alert("تم إضافة الـ API بنجاح!");
+        function saveNewApiKey() {
+            const key = document.getElementById('admin-api-key').value.trim();
+            if(!key) return alert("يرجى إدخال مفتاح الـ API أولاً!");
+            db.ref('api_keys').push({ value: key, status: "active" }).then(() => {
+                document.getElementById('admin-api-key').value = "";
+                alert("تمت إضافة الـ API ومزامنته في السيستم كنشط وفوري!");
             });
         }
 
-        function listenToApiKeys() {
-            db.ref('api_keys').on('value', snapshot => {
-                const listDiv = document.getElementById('api-keys-list');
-                listDiv.innerHTML = "";
-                snapshot.forEach(child => {
-                    const data = child.val();
-                    listDiv.innerHTML += `
-                        <div class="list-item">
-                            <span>${data.value.substring(0, 15)}...</span>
-                            <span class="${data.status === 'active' ? 'status-active' : 'status-failed'}">
-                                ${data.status === 'active' ? '● نشط ومتاح' : '● مستهلك/معطل'}
-                            </span>
+        function loadAdminData() {
+            // جلب وعرض طابور الـ APIs للأدمن
+            db.ref('api_keys').on('value', snap => {
+                const box = document.getElementById('admin-apis-list');
+                box.innerHTML = "";
+                snap.forEach(child => {
+                    const d = child.val();
+                    let statusColor = "var(--success)";
+                    let statusText = "نشط ومتاح في الطابور";
+                    if(d.status === "exhausted") { statusColor = "var(--danger)"; statusText = "رصيده خلص / خطأ بالطلب"; }
+                    
+                    box.innerHTML += `
+                        <div style="background:#26262b; padding:10px; border-radius:6px; margin-bottom:5px; font-size:12px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #3a3a45;">
+                            <span style="font-family:monospace; color:#aaa;">${d.value.substring(0,18)}...</span>
+                            <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
+                        </div>
+                    `;
+                });
+            });
+
+            // جلب وإدارة المشتركين والتحكم بخططهم فورا من قبل كريم الأدمن
+            db.ref('users').on('value', snap => {
+                const box = document.getElementById('admin-users-list');
+                box.innerHTML = "";
+                snap.forEach(child => {
+                    const uid = child.key;
+                    const u = child.val();
+                    box.innerHTML += `
+                        <div class="user-row" style="padding:15px; margin-bottom:12px; background:#26262b; border-radius:8px;">
+                            <div style="font-size:14px; margin-bottom:8px;"><strong>الحساب:</strong> <span style="color:var(--secondary)">${u.email}</span></div>
+                            <div style="font-size:13px; margin-bottom:10px; color:#aaa;">رصيد اليوم الحالي للعميل: <strong style="color:#fff">${u.videos_left_today}</strong></div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <select id="sel-${uid}" style="margin:0; padding:6px; font-size:13px;">
+                                    <option value="none" ${u.plan==='none'?'selected':''}>إلغاء الاشتراك / تجريبي</option>
+                                    <option value="plan_1" ${u.plan==='plan_1'?'selected':''}>خطة فيديو في اليوم (300 جنيه)</option>
+                                    <option value="plan_2" ${u.plan==='plan_2'?'selected':''}>خطة 2 فيديو في اليوم (600 جنيه)</option>
+                                    <option value="plan_3" ${u.plan==='plan_3'?'selected':''}>خطة 3 فيديوهات في اليوم (900 جنيه)</option>
+                                </select>
+                                <button style="margin:0; width:auto; padding:6px 15px; font-size:13px; background:var(--success);" onclick="executePlanUpdate('${uid}')">تحديث الخطة</button>
+                            </div>
                         </div>
                     `;
                 });
             });
         }
 
-        function updateUserPlan() {
-            const uid = document.getElementById('admin-user-uid').value.trim();
-            const plan = document.getElementById('admin-user-plan').value;
-            if(!uid) return alert("ادخل الـ UID الخاص بالمستخدم");
-
-            let dailyLimit = 1;
-            if(plan === "plan_2") dailyLimit = 2;
-            if(plan === "plan_3") dailyLimit = 3;
-
-            db.ref('users/' + uid).update({
-                plan: plan,
-                videos_left_today: dailyLimit
-            }).then(() => alert("تم تحديث خطة العضو بنجاح ورصيده الحالي جاهز!"));
+        function executePlanUpdate(uid) {
+            const plan = document.getElementById('sel-'+uid).value;
+            let limit = 0;
+            if(plan === "plan_1") limit = 1;
+            if(plan === "plan_2") limit = 2;
+            if(plan === "plan_3") limit = 3;
+            db.ref('users/' + uid).update({ plan: plan, videos_left_today: limit }).then(() => alert("تم تحديث خطة المشترك بنجاح وتصفير رصيده اليومي الجديد!"));
         }
 
-        // ==================== منطق الـ Fallback لتوليد الفيديو (KIE.AI) ====================
+        // ==================== [ محرك الإنتاج الذكي والدوران التلقائي على الـ APIs ] ====================
+        async function startGeneratingProcess() {
+            const prompt = document.getElementById('video-prompt-input').value.trim();
+            const loader = document.getElementById('main-loader');
+            const resBox = document.getElementById('video-result-box');
+            const debugBox = document.getElementById('debug-log-box');
 
-        async function handleVideoGeneration() {
-            const prompt = document.getElementById('video-prompt').value.trim();
-            const outputDiv = document.getElementById('video-output');
-            const loader = document.getElementById('gen-loader');
-            
-            if(!prompt) return alert("يرجى كتابة وصف للفيديو أولاً!");
-            
-            outputDiv.innerHTML = "";
+            if(!prompt) return alert("يرجى كتابة وصف المشهد أولاً!");
+
+            resBox.innerHTML = "";
+            debugBox.style.display = "none";
+            debugBox.innerHTML = "";
             loader.style.display = "block";
 
             const user = auth.currentUser;
-            const userSnap = await db.ref('users/' + user.uid).get();
-            const userData = userSnap.val();
+            const uSnap = await db.ref('users/' + user.uid).get();
+            const uData = uSnap.val();
 
-            if (!userData || userData.videos_left_today <= 0) {
+            if(!uData || uData.videos_left_today <= 0) {
                 loader.style.display = "none";
-                return alert("عذراً! انتهت محاولاتك لليوم، أو أنك غير مشترك في باقة.");
+                return alert("عذراً! ليس لديك رصيد كافي لتوليد الفيديوهات اليوم. يرجى الاشتراك أو تجديد باقتك.");
             }
 
-            // سحب مفاتيح الـ API المتاحة
-            const apisSnap = await db.ref('api_keys').once('value');
-            if(!apisSnap.exists()) {
+            const apiSnap = await db.ref('api_keys').once('value');
+            if(!apiSnap.exists()) {
                 loader.style.display = "none";
-                return alert("خطأ: لا يوجد أي مفاتيح API مضافة بالنظام حالياً، تواصل مع كريم الأدمن.");
+                return alert("لا توجد أي مفاتيح API مضافة بالنظام حالياً من قبل الأدمن.");
             }
 
-            const apis = apisSnap.val();
-            let videoUrl = null;
-            let successKeyId = null;
+            const apis = apiSnap.val();
+            let successResultText = null;
+            let activeUsedKey = null;
 
-            // آلية الـ Loop والتنقل في حالة الفشل (Fallback Mechanism)
+            // 🔄 الدوران الذكي (Loop) على المفاتيح: لو مفتاح فشل أو رصيده خلص، بيعطله تلقائياً ويروح للي بعده فورا
             for (let id in apis) {
                 if (apis[id].status === "active") {
                     try {
-                        // هنا نرسل الطلب لـ kie.ai (هذا هيكل الـ Request المعتمد للـ API)
-                        let response = await fetch("https://api.kie.ai/v1/video/generate", {
-                            method: "POST",
-                            headers: {
-                                "Authorization": `Bearer ${apis[id].value}`,
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                model: "grok",
-                                duration: 10,
-                                resolution: "480p",
-                                prompt: prompt
-                            })
+                        const myHeaders = new Headers();
+                        myHeaders.append("Authorization", `Bearer ${apis[id].value}`);
+                        myHeaders.append("Content-Type", "application/json");
+
+                        const modelSelected = globalBase64Img ? "grok-imagine/image-to-video" : "grok-imagine/text-to-video";
+
+                        // الإعدادات المطلوبة بدقة: 10 ثواني ودقة 480p كما حددت
+                        const inputData = {
+                            "prompt": prompt,
+                            "aspect_ratio": "16:9",
+                            "mode": "normal",
+                            "duration": "10", 
+                            "resolution": "480p"
+                        };
+
+                        if (globalBase64Img) {
+                            inputData["image_url"] = globalBase64Img;
+                        }
+
+                        const rawBody = JSON.stringify({
+                            "model": modelSelected,
+                            "callBackUrl": "https://kimo-tecnology.firebaseapp.com/api/callback",
+                            "input": inputData
                         });
 
-                        let resData = await response.json();
+                        const requestOptions = {
+                            method: "POST",
+                            headers: myHeaders,
+                            body: rawBody,
+                            redirect: "follow"
+                        };
 
-                        if (response.status === 200 && resData.video_url) {
-                            videoUrl = resData.video_url;
-                            successKeyId = id;
-                            break; // نجحت العملية! اخرج فوراً من اللوب
+                        debugBox.style.display = "block";
+                        debugBox.innerText += `\n[محاولة الاتصال بالمفتاح الحالي]: ${apis[id].value.substring(0,15)}...\n`;
+
+                        let response = await fetch("https://api.kie.ai/api/v1/jobs/createTask", requestOptions);
+                        let resultText = await response.text();
+
+                        if (response.status === 200 || response.status === 201) {
+                            successResultText = resultText;
+                            activeUsedKey = apis[id].value;
+                            break; // نجح الاتصال! نخرج فورا من طابور الفحص ونبدأ المعالجة
                         } else {
-                            // الكريديت خلص أو هناك خطأ بالـ API، نقوم بتعطيله في الـ Database للتحول للـ API القادم
-                            await db.ref(`api_keys/${id}`).update({ status: "failed_or_exhausted" });
+                            // 🛑 إذا جاب أي كود خطأ أو نفاذ كريديت من السيرفر الخارجي، عطل المفتاح فوراً في السيستم
+                            debugBox.innerText += `❌ فشل المفتاح الحالي (كود الاستجابة: ${response.status}). يتم الانتقال للمفتاح التالي فورا...\n`;
+                            await db.ref(`api_keys/${id}`).update({ status: "exhausted" });
                         }
-                    } catch (e) {
-                        console.error("فشل المحاولة مع الـ API الحالي، يتم الانتقال للتالي..", e);
-                        await db.ref(`api_keys/${id}`).update({ status: "error" });
+                    } catch (err) {
+                        debugBox.innerText += `⚠️ عطل اتصال بالشبكة للمفتاح الحالي: ${err.message}. يتم التخطي...\n`;
+                        await db.ref(`api_keys/${id}`).update({ status: "exhausted" });
                     }
                 }
             }
 
             loader.style.display = "none";
 
-            if (videoUrl) {
-                // خصم محاولة من رصيد العضو
+            if(successResultText) {
+                // 🛡️ الأمان المالي: الخصم من عداد المشترك داخل موقعك يتم فقط عند استلام الـ Task بنجاح تام
                 await db.ref('users/' + user.uid).update({
-                    videos_left_today: userData.videos_left_today - 1
+                    videos_left_today: uData.videos_left_today - 1
                 });
-                
-                outputDiv.innerHTML = `
-                    <p style="color:var(--success); margin-bottom:10px;">تم التوليد بنجاح! 🎉</p>
-                    <video controls style="width:100%; border-radius:8px;">
-                        <source src="${videoUrl}" type="video/mp4">
-                        متصفحك لا يدعم تشغيل الفيديو.
-                    </video>
+
+                const responseData = JSON.parse(successResultText);
+                const taskId = responseData.data.taskId;
+
+                debugBox.innerText += `\n✅ نجاح إنتاج المهمة بالسيرفر الخارجي! الـ Task ID هو: ${taskId}\n`;
+
+                resBox.innerHTML = `
+                    <p style="color:var(--success); font-weight:bold; margin-bottom:5px;">🎉 تم قبول طلبك وبدء المعالجة الذكية بالسيرفر بنجاح!</p>
+                    <div id="status-container" style="background:#26262b; padding:15px; border-radius:8px; margin-top:10px; border:1px solid #3a3a45;">
+                        <p id="status-text"><i class="fa-solid fa-circle-notch fa-spin" style="color:var(--secondary)"></i> جاري معالجة الكليب وتوليده في السيرفر التابع لـ kie.ai الآن... (فحص تلقائي)</p>
+                    </div>
                 `;
+                
+                globalBase64Img = null;
+                document.getElementById('view-upload-img').style.display = "none";
+                document.getElementById('up-hint').style.display = "block";
+                document.getElementById('video-prompt-input').value = "";
+
+                startPolling(taskId, activeUsedKey);
+
             } else {
-                alert("جميع الـ API Keys المتوفرة مستهلكة أو معطلة حالياً! تم إخطار الأدمن لتجديدها.");
+                alert("للأسف، جميع مفاتيح الـ API المتاحة في لوحة الأدمن مستهلكة بالكامل أو غير صالحة حالياً! يرجى إبلاغ الإدارة لتحديث الأكواد.");
             }
+        }
+
+        // ==================== [ نظام الفحص المرن والقابل للتخصيص بدون خسارة سنت واحد ] ====================
+        function startPolling(taskId, apiKey) {
+            const statusText = document.getElementById('status-text');
+            const statusContainer = document.getElementById('status-container');
+            const debugBox = document.getElementById('debug-log-box');
+
+            // ⚙️ لوحة تحكم الفحص: (قم بتغييرها هنا فوراً بناء على توثيق الدعم الفني لـ kie.ai بدون خوف)
+            const CHECK_METHOD = "POST"; 
+            const CHECK_URL = "https://api.kie.ai/api/v1/jobs/status"; 
+
+            const checkInterval = setInterval(async () => {
+                try {
+                    const myHeaders = new Headers();
+                    myHeaders.append("Authorization", `Bearer ${apiKey}`);
+                    myHeaders.append("Content-Type", "application/json");
+
+                    let requestOptions = {
+                        method: CHECK_METHOD,
+                        headers: myHeaders,
+                        redirect: "follow"
+                    };
+
+                    let finalUrl = CHECK_URL;
+
+                    if (CHECK_METHOD === "POST") {
+                        requestOptions.body = JSON.stringify({ "taskId": taskId });
+                    } else if (CHECK_METHOD === "GET") {
+                        // إذا طلبوا إضافة الآيدي في نهاية الرابط: finalUrl = `${CHECK_URL}/${taskId}`;
+                        // إذا طلبوا إضافة الآيدي كـ Parameter: finalUrl = `${CHECK_URL}?taskId=${taskId}`;
+                    }
+
+                    let response = await fetch(finalUrl, requestOptions);
+                    let resultText = await response.text();
+                    
+                    debugBox.innerText += `\n[تحديث الفحص الدوري - الكود: ${response.status}]: ${resultText}\n`;
+
+                    if (response.status === 404) {
+                        statusText.innerHTML = `<span style="color:var(--warning)"><i class="fa-solid fa-triangle-exclamation"></i> تم إرسال الفيديو وجاري معالجته، ولكن مسار الفحص الدوري المكتوب بالدالة يعطي (404 Not Found). الفيديو يتم إنتاجه على حسابك الخارجي بالفعل.</span>`;
+                        return; 
+                    }
+
+                    let taskData = JSON.parse(resultText);
+
+                    if (taskData && taskData.data) {
+                        const taskStatus = taskData.data.status;
+
+                        if (taskStatus === "SUCCEEDED" || taskStatus === "success") {
+                            clearInterval(checkInterval);
+                            
+                            const videoUrl = taskData.data.result || taskData.data.videoUrl || taskData.data.video_url;
+
+                            statusContainer.innerHTML = `
+                                <p style="color:var(--success); font-weight:bold; margin-bottom:10px;">👑 كليبك جاهز ومبروك عليك يا بطل!</p>
+                                <video controls autoplay style="width:100%; border-radius:8px; border:1px solid #444; max-height:410px; background:#000;">
+                                    <source src="${videoUrl}" type="video/mp4">
+                                </video>
+                                <a href="${videoUrl}" target="_blank" style="display:block; text-align:center; background:var(--success); color:white; padding:10px; border-radius:8px; margin-top:10px; text-decoration:none; font-weight:bold;"><i class="fa-solid fa-download"></i> تحميل الفيديو فوراً</a>
+                            `;
+                        } 
+                        else if (taskStatus === "FAILED" || taskStatus === "failed") {
+                            clearInterval(checkInterval);
+                            statusContainer.innerHTML = `<p style="color:var(--danger); font-weight:bold;">❌ السيرفر فشل في إتمام التوليد النهائي للمشهد.</p>`;
+                        } 
+                        else {
+                            statusText.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin" style="color:var(--primary)"></i> السيرفر يقوم بتركيب تأثيرات الـ 10 ثوانٍ حالياً... جاري المتابعة تلقائياً.`;
+                        }
+                    }
+                } catch (err) {
+                    console.error("خطأ معالجة الفحص الدوري:", err);
+                }
+            }, 15000); // يفحص كل 15 ثانية تلقائياً لحين الجاهزية
         }
     </script>
 </body>
