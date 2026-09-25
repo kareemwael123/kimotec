@@ -1,608 +1,1320 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" class="dark scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kimo Technology - استوديو توليد كليبات Grok</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TIAN HOSTING — Next-Gen Game Server & Discord Bot Cloud</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --dark-bg: #0f0f12;
-            --card-bg: #1a1a1f;
-            --input-bg: #26262b;
-            --text-color: #f5f5f7;
-            --success: #00b894;
-            --danger: #d63031;
-            --warning: #f1c40f;
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cyber: {
+              bg: '#060811',
+              card: '#0d1222',
+              border: '#1e293b',
+              cyan: '#00f2fe',
+              blue: '#4facfe',
+              purple: '#a855f7',
+              emerald: '#10b981',
+              amber: '#f59e0b'
+            }
+          }
         }
+      }
+    }
+  </script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-            padding: 30px;
-            border: 1px solid #2c2c35;
-        }
-
-        h2, h3, h4 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #3a3a45;
-            background: var(--input-bg);
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        button:hover { background: var(--secondary); }
-        .btn-google { background: #db4437; margin-bottom: 15px; }
-        .btn-google:hover { background: #e57373; }
-        .btn-danger { background: var(--danger); }
-        .btn-danger:hover { background: #ff7675; }
-
-        .screen { display: none; }
-        .screen.active { display: block; }
-
-        .layout-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.3fr;
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        @media (max-width: 800px) {
-            .layout-grid { grid-template-columns: 1fr; }
-        }
-
-        .card {
-            background: #212126;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #2d2d35;
-        }
-
-        .upload-box {
-            border: 2px dashed #4e4e5a;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-            margin: 10px 0;
-            background: var(--input-bg);
-        }
-
-        .upload-box input[type="file"] {
-            position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;
-        }
-
-        .preview-img {
-            max-width: 100%; max-height: 140px; border-radius: 6px; margin-top: 10px; display: none;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2d2d35;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .user-row {
-            background: var(--input-bg);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #2d2d35;
-        }
-
-        .badge { background: var(--primary); padding: 2px 8px; border-radius: 12px; font-size: 12px; }
-        .loader { display: none; text-align: center; margin: 15px 0; color: var(--secondary); font-weight: bold; }
-        
-        .debug-panel {
-            background: #000; color: #00ff00; font-family: monospace; font-size: 11px; padding: 12px;
-            border-radius: 6px; margin-top: 15px; direction: ltr; text-align: left; max-height: 180px; 
-            overflow-y: auto; border: 1px solid #333; display: none;
-        }
-    </style>
+  <style>
+    body {
+      background-color: #060811;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    .bg-grid {
+      background-size: 42px 42px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .glass {
+      background: rgba(13, 18, 34, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .plan-card {
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .plan-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 45px -15px rgba(0, 242, 254, 0.18);
+      border-color: rgba(0, 242, 254, 0.45);
+    }
+    .owner-glow {
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #060811;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+  </style>
 </head>
-<body>
+<body class="bg-grid min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
 
-    <div class="container">
+  <!-- Ambient Glows -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-cyan-500/15 rounded-full blur-[130px]"></div>
+    <div class="absolute top-1/3 -right-40 w-[30rem] h-[30rem] bg-purple-600/15 rounded-full blur-[140px]"></div>
+    <div class="absolute bottom-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-[130px]"></div>
+  </div>
 
-        <div id="screen-auth" class="screen active">
-            <h2><i class="fa-solid fa-bolt"></i> منصة Kimo Technology الذكية</h2>
-            <p style="text-align: center; color: #888; margin-bottom: 20px;">إنتاج فيديوهات Grok بدقة 480p ولمدة 10 ثوانٍ كاملة</p>
-            
-            <button class="btn-google" onclick="signWithGoogle()"><i class="fa-brands fa-google"></i> الدخول السريع بحساب Google</button>
-            
-            <div style="text-align:center; margin: 10px; color:#555;">أو عبر البريد الإلكتروني للسيستم</div>
-            <input type="email" id="auth-email" placeholder="البريد الإلكتروني">
-            <input type="password" id="auth-pass" placeholder="كلمة المرور">
-            <button onclick="signWithEmail('login')">تسجيل الدخول</button>
-            <button style="background:#26262b; color:#aaa;" onclick="signWithEmail('register')">إنشاء حساب جديد</button>
-        </div>
-
-        <div id="screen-admin" class="screen">
-            <div class="top-bar">
-                <h3>لوحة تحكم الأدمن الرئيسي 👑</h3>
-                <button style="width:auto; padding:5px 15px;" class="btn-danger" onclick="logOut()">خروج</button>
-            </div>
-            
-            <div class="layout-grid">
-                <div class="card">
-                    <h4><i class="fa-solid fa-key"></i> إدارة مفاتيح ومحفظة kie.ai</h4>
-                    <input type="text" id="admin-api-key" placeholder="ألصق الـ API Key الجديد هنا">
-                    <button onclick="saveNewApiKey()">إضافة ومزامنة المفتاح في الطابور</button>
-                    
-                    <h5 style="margin-top:20px; color: #aaa; font-size:14px;">طابور المفاتيح وحالتها الفورية:</h5>
-                    <div id="admin-apis-list" style="max-height: 200px; overflow-y:auto; margin-top:10px;"></div>
-                </div>
-
-                <div class="card">
-                    <h4><i class="fa-solid fa-users"></i> التحكم في باقات الأعضاء والاشتراكات</h4>
-                    <div id="admin-users-list" style="max-height: 350px; overflow-y:auto;"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="screen-user" class="screen">
-            <div class="top-bar">
-                <div>أهلاً بك: <span id="user-name" class="badge">..</span></div>
-                <button style="width:auto; padding:5px 15px;" class="btn-danger" onclick="logOut()">خروج</button>
-            </div>
-
-            <div class="layout-grid">
-                <div class="card" style="text-align: center;">
-                    <h4>حالة اشتراكك اليومي</h4>
-                    <div style="font-size: 35px; color: var(--primary); margin: 15px 0;"><i class="fa-solid fa-video"></i></div>
-                    <p>باقة الحساب: <strong id="user-plan-txt" style="color:var(--secondary)">جاري التحقق..</strong></p>
-                    <p style="margin-top:10px;">الفيديوهات المتاحة لك اليوم: <strong id="user-counter-txt" style="color:var(--success); font-size:24px;">0</strong></p>
-                </div>
-
-                <div class="card">
-                    <h4><i class="fa-solid fa-wand-magic-sparkles"></i> استوديو صناعة فيديو Grok (10 ثوانٍ)</h4>
-                    
-                    <div class="upload-box">
-                        <i class="fa-solid fa-cloud-arrow-up" style="font-size:22px; color:var(--primary)"></i>
-                        <p id="up-hint" style="font-size:12px; color:#888; margin-top:5px;">ارفع صورة تحريك اختيارية (Image to Video)</p>
-                        <input type="file" id="video-file-img" accept="image/*" onchange="convertImgToBase64(this)">
-                        <img id="view-upload-img" class="preview-img">
-                    </div>
-
-                    <textarea id="video-prompt-input" rows="4" placeholder="اكتب تفاصيل الكليب والمشهد الذي تريد توليده بالكامل هنا..."></textarea>
-                    
-                    <button onclick="startGeneratingProcess()"><i class="fa-solid fa-play"></i> ابدأ التوليد الآن</button>
-                    
-                    <div class="loader" id="main-loader"><i class="fa-solid fa-circle-notch fa-spin"></i> جاري فحص مفاتيح الـ API وتحضير طلب السيرفر...</div>
-                    <div id="video-result-box" style="margin-top: 15px;"></div>
-                    
-                    <div id="debug-log-box" class="debug-panel"></div>
-                </div>
-            </div>
-        </div>
-
+  <!-- Top Announcement Banner (Editable by Owner) -->
+  <div id="topAnnouncementBar" class="relative z-40 bg-gradient-to-r from-cyan-500/15 via-purple-500/15 to-cyan-500/15 border-b border-white/10 px-4 py-2 text-center text-xs sm:text-sm">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-2">
+      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span> LIVE INFRASTRUCTURE
+      </span>
+      <span id="announcementText" class="text-slate-200 font-medium">
+        Instant Deployment on Ryzen 9 7950X Nodes • Enterprise DDoS Protection Included!
+      </span>
+      <a id="topDiscordLink" href="https://discord.gg/tianhosting" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-4 ml-1">
+        <span>Join Support Discord</span>
+        <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+      </a>
     </div>
+  </div>
 
-    <script>
-        // 🛠️ بيانات الـ Firebase Config الخاصة بك مدمجة وجاهزة للعمل فورا
-        const firebaseConfig = {
-            apiKey: "AIzaSyB48E8FEkT2t_U9kUZYtWLJBxpCtMrAQZY",
-            authDomain: "kimo-tecnology.firebaseapp.com",
-            databaseURL: "https://kimo-tecnology-default-rtdb.firebaseio.com",
-            projectId: "kimo-tecnology",
-            storageBucket: "kimo-tecnology.firebasestorage.app",
-            messagingSenderId: "27878132504",
-            appId: "1:27878132504:web:5559659d4a2342747cac6d",
-            measurementId: "G-4P6L2GPWZV"
-        };
+  <!-- Navigation Header -->
+  <header class="sticky top-0 z-40 glass border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <!-- Brand -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-600 p-[1px] shadow-lg shadow-cyan-500/20">
+          <div class="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center">
+            <i data-lucide="cpu" class="w-6 h-6 text-cyan-400 group-hover:rotate-12 transition-transform"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-extrabold text-xl tracking-tight text-white">TIAN <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">HOSTING</span></span>
+            <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">99.99% SLA</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-mono">High-Frequency Cloud Nodes</p>
+        </div>
+      </a>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+      <!-- Nav Links -->
+      <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-slate-300">
+        <a href="#plans" class="hover:text-cyan-400 transition-colors">Pricing Plans</a>
+        <a href="#advisor" class="hover:text-cyan-400 transition-colors">Plan Advisor</a>
+        <a href="#panel-preview" class="hover:text-cyan-400 transition-colors">Control Panel</a>
+        <a href="#features" class="hover:text-cyan-400 transition-colors">Infrastructure</a>
+        <a id="navDiscordBtn" href="https://discord.gg/tianhosting" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-indigo-300 hover:text-indigo-200 transition-colors">
+          <i data-lucide="message-square-code" class="w-4 h-4"></i>
+          <span>Discord Support</span>
+        </a>
+      </nav>
 
-        let globalBase64Img = null;
+      <!-- Right Controls: Currency + Owner + Google Auth -->
+      <div class="flex items-center gap-2.5">
+        <!-- Currency Selector -->
+        <div class="hidden sm:flex items-center bg-slate-900/90 border border-slate-800 rounded-lg p-1 text-xs font-mono">
+          <button onclick="setCurrency('USD')" id="curr-USD" class="px-2 py-1 rounded bg-cyan-500 text-slate-950 font-bold transition">USD $</button>
+          <button onclick="setCurrency('EGP')" id="curr-EGP" class="px-2 py-1 rounded text-slate-400 hover:text-white transition">EGP</button>
+          <button onclick="setCurrency('SAR')" id="curr-SAR" class="px-2 py-1 rounded text-slate-400 hover:text-white transition">SAR</button>
+        </div>
 
-        function changeView(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        <!-- Owner Control Button (Hidden unless kareemwael0213@gmail.com is logged in) -->
+        <button id="ownerDashboardBtn" onclick="openOwnerModal()" class="hidden items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs sm:text-sm owner-glow hover:brightness-110 transition">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Owner Panel</span>
+        </button>
+
+        <!-- Auth Logged Out State -->
+        <button id="googleLoginBtn" onclick="signInWithGoogle()" class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white text-slate-950 hover:bg-slate-100 font-semibold text-xs sm:text-sm shadow-lg shadow-white/5 transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+            <path fill="#FBBC05" d="M5.3 14.2c-.2-.7-.3-1.4-.3-2.2s.1-1.5.3-2.2L1.6 7C.6 9 0 11.2 0 12s.6 3 1.6 4.9l3.7-2.7z"/>
+            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5L1.6 16c1.9 3.9 5.8 7 10.4 7z"/>
+          </svg>
+          <span>Sign in with Google</span>
+        </button>
+
+        <!-- Auth Logged In State -->
+        <div id="userProfileBox" class="hidden items-center gap-2.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5 pr-3">
+          <img id="userAvatar" src="" alt="Avatar" class="w-8 h-8 rounded-lg object-cover border border-cyan-500/40" />
+          <div class="hidden md:block text-left leading-tight">
+            <div class="flex items-center gap-1.5">
+              <span id="userName" class="text-xs font-bold text-white truncate max-w-[120px]">User</span>
+              <span id="ownerBadge" class="hidden text-[10px] font-mono font-extrabold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">OWNER</span>
+            </div>
+            <p id="userEmail" class="text-[10px] text-slate-400 font-mono truncate max-w-[150px]"></p>
+          </div>
+          <button onclick="logoutUser()" title="Sign Out" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative z-10 flex-grow">
+
+    <!-- HERO SECTION -->
+    <section class="pt-14 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-12 gap-12 items-center">
+        <!-- Left Column -->
+        <div class="lg:col-span-7 space-y-6 text-left">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>NVMe Gen4 Storage • DDR5 Memory • Unmetered Bandwidth</span>
+          </div>
+
+          <h1 class="font-display font-extrabold text-4xl sm:text-6xl lg:text-7xl tracking-tight leading-[1.06]">
+            UNLEASH RAW <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500">SERVER POWER</span>
+          </h1>
+
+          <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+            Deploy ultra-low latency <strong class="text-white">Minecraft & Game Servers</strong> or 24/7 <strong class="text-white">Discord Bots</strong> in seconds. Starting at just <span class="text-cyan-400 font-mono font-bold">$0.50/mo</span> with full root Pterodactyl panel access and enterprise DDoS mitigation.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <a href="#plans" class="inline-flex items-center gap-2.5 px-7 py-4 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-display font-bold text-base shadow-xl shadow-cyan-500/20 hover:brightness-110 transition">
+              <span>Explore Hosting Plans</span>
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+            <a id="heroDiscordBtn" href="https://discord.gg/tianhosting" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-6 py-4 rounded-xl glass hover:border-indigo-400/50 text-white font-semibold text-base transition">
+              <i data-lucide="headphones" class="w-5 h-5 text-indigo-400"></i>
+              <span>Contact Support on Discord</span>
+            </a>
+          </div>
+
+          <!-- Quick Metrics -->
+          <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80 max-w-xl">
+            <div>
+              <div class="font-display font-extrabold text-2xl sm:text-3xl text-white">64 GB</div>
+              <div class="text-xs text-slate-400 font-mono">Max RAM Per Node</div>
+            </div>
+            <div>
+              <div class="font-display font-extrabold text-2xl sm:text-3xl text-cyan-400">&lt; 15ms</div>
+              <div class="text-xs text-slate-400 font-mono">EU / ME / US Ping</div>
+            </div>
+            <div>
+              <div class="font-display font-extrabold text-2xl sm:text-3xl text-purple-400">12 Tbps</div>
+              <div class="text-xs text-slate-400 font-mono">DDoS Mitigation</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Telemetry Card -->
+        <div class="lg:col-span-5">
+          <div class="glass rounded-2xl p-6 border border-cyan-500/20 shadow-2xl relative overflow-hidden">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <span class="ml-2 text-xs font-mono text-slate-400">node-01.tianhosting.cloud</span>
+              </div>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">ONLINE</span>
+            </div>
+
+            <div class="space-y-4 font-mono text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 space-y-2">
+                <div class="flex justify-between text-slate-400">
+                  <span>CPU LOAD (AMD Ryzen 9 7950X)</span>
+                  <span id="heroCpuVal" class="text-cyan-400 font-bold">24.8%</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div id="heroCpuBar" class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700" style="width: 25%"></div>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 space-y-2">
+                <div class="flex justify-between text-slate-400">
+                  <span>NVMe GEN4 I/O SPEED</span>
+                  <span class="text-purple-400 font-bold">7,420 MB/s</span>
+                </div>
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-purple-500 to-pink-500" style="width: 88%"></div>
+                </div>
+              </div>
+
+              <!-- ASCII Price Quick View -->
+              <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-[11px] leading-relaxed text-slate-300 overflow-x-auto">
+                <div class="text-cyan-400 font-bold mb-1">// VERIFIED TIAN HOSTING TIERS</div>
+                <div>• Premium Servers: <span class="text-emerald-400">$0.60</span> (Dirt 2GB) → <span class="text-emerald-400">$16.85</span> (Infinity 64GB)</div>
+                <div>• Discord Bots: <span class="text-purple-400">$0.50</span> (Starter 512MB) → <span class="text-purple-400">$4.00</span> (Ultra 4GB)</div>
+                <div class="mt-2 text-slate-400">Status: <span class="text-white">Instant Ticket & Automated Provisioning</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING PLANS SECTION -->
+    <section id="plans" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="text-center max-w-3xl mx-auto space-y-4 mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono uppercase">
+          Transparent Cloud Pricing
+        </div>
+        <h2 class="font-display font-extrabold text-3xl sm:text-5xl text-white">
+          CHOOSE YOUR <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">DEPLOYMENT TIER</span>
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base">
+          Switch between <strong class="text-slate-200">Premium Game Servers</strong> and <strong class="text-slate-200">Discord Bot Hosting</strong>. Every plan includes NVMe SSD storage, full SFTP access, and DDoS protection.
+        </p>
+
+        <!-- Category & Billing Controls -->
+        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <!-- Category Tabs -->
+          <div class="inline-flex p-1.5 rounded-2xl bg-slate-900 border border-slate-800">
+            <button onclick="switchCategory('all')" id="tab-all" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 transition">
+              All Plans (12)
+            </button>
+            <button onclick="switchCategory('premium')" id="tab-premium" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition flex items-center gap-1.5">
+              <i data-lucide="server" class="w-4 h-4 text-cyan-400"></i>
+              <span>Premium Servers (8)</span>
+            </button>
+            <button onclick="switchCategory('bot')" id="tab-bot" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition flex items-center gap-1.5">
+              <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i>
+              <span>Discord Bots (4)</span>
+            </button>
+          </div>
+
+          <!-- Billing Cycle Toggle -->
+          <div class="inline-flex items-center gap-2 bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-2xl text-xs font-mono">
+            <button onclick="setBillingCycle(1)" id="cycle-1" class="px-2.5 py-1 rounded-lg bg-slate-800 text-cyan-400 font-bold">Monthly</button>
+            <button onclick="setBillingCycle(3)" id="cycle-3" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white">Quarterly (-5%)</button>
+            <button onclick="setBillingCycle(12)" id="cycle-12" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white">Yearly (-15%)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREMIUM SERVER PLANS HEADER & GRID -->
+      <div id="premiumSectionWrapper" class="mb-16">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-6 mb-6 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <i data-lucide="hard-drive" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-xl sm:text-2xl text-white">TIAN HOSTING — PREMIUM SERVER PLANS</h3>
+              <p class="text-xs text-slate-400 font-mono">Optimized for Minecraft (Paper, Purpur, Forge, Fabric), Rust & High-Tick Game Servers</p>
+            </div>
+          </div>
+          <span class="text-xs font-mono text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1.5 rounded-lg self-start sm:self-auto">
+            8 Scalable Tiers • Up to 64GB RAM
+          </span>
+        </div>
+
+        <div id="premiumPlansGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <!-- DISCORD BOT PLANS HEADER & GRID -->
+      <div id="botSectionWrapper">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-6 mb-6 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+              <i data-lucide="bot" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-xl sm:text-2xl text-white">TIAN HOSTING — DISCORD BOT PLANS</h3>
+              <p class="text-xs text-slate-400 font-mono">24/7 Uptime for Node.js (Discord.js), Python (Discord.py / Pycord), Java & Lavalink Audio Nodes</p>
+            </div>
+          </div>
+          <span class="text-xs font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-lg self-start sm:self-auto">
+            4 Dedicated Tiers • Starting at $0.50/mo
+          </span>
+        </div>
+
+        <div id="botPlansGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE PLAN ADVISOR / CALCULATOR -->
+    <section id="advisor" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="glass rounded-3xl p-6 sm:p-10 border border-cyan-500/25">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-6">
+            <div>
+              <span class="text-xs font-mono uppercase text-cyan-400">Smart Resource Calculator</span>
+              <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-white mt-1">Not Sure Which Plan Fits Your Project?</h3>
+              <p class="text-slate-400 text-sm mt-1">Adjust the parameters below and our engine will match you with the exact TIAN HOSTING tier.</p>
+            </div>
+
+            <div class="space-y-5">
+              <!-- Workload Type -->
+              <div>
+                <label class="block text-xs font-mono uppercase text-slate-300 mb-2">1. Select Workload Type</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button onclick="setAdvisorMode('server')" id="adv-mode-server" class="p-3.5 rounded-xl border border-cyan-500 bg-cyan-500/15 text-white font-semibold text-sm flex items-center justify-center gap-2 transition">
+                    <i data-lucide="Pickaxe" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Minecraft / Game Server</span>
+                  </button>
+                  <button onclick="setAdvisorMode('bot')" id="adv-mode-bot" class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-300 hover:text-white font-semibold text-sm flex items-center justify-center gap-2 transition">
+                    <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i>
+                    <span>Discord Bot / App</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Players / Guilds Slider -->
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span id="advSliderLabel" class="text-slate-300">2. Estimated Concurrent Players</span>
+                  <span id="advSliderValue" class="text-cyan-400 font-bold">25 Players</span>
+                </div>
+                <input id="advSlider" type="range" min="5" max="250" value="25" oninput="updateAdvisor()" class="w-full accent-cyan-400 cursor-pointer" />
+              </div>
+
+              <!-- Complexity -->
+              <div>
+                <label id="advComplexityLabel" class="block text-xs font-mono uppercase text-slate-300 mb-2">3. Plugins / Modpack Load</label>
+                <div class="grid grid-cols-3 gap-2.5 text-xs">
+                  <button onclick="setAdvisorComplexity(1)" id="adv-comp-1" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 font-medium">Light / Vanilla</button>
+                  <button onclick="setAdvisorComplexity(2)" id="adv-comp-2" class="p-2.5 rounded-xl border border-cyan-500 bg-cyan-500/15 text-white font-bold">Standard Plugins</button>
+                  <button onclick="setAdvisorComplexity(3)" id="adv-comp-3" class="p-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 font-medium">Heavy Modpacks</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommended Output Card -->
+          <div class="lg:col-span-5">
+            <div class="p-6 rounded-2xl bg-slate-950/95 border border-cyan-500/40 space-y-5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-mono uppercase px-2.5 py-1 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Recommended Match</span>
+                <span id="advRecCategory" class="text-xs font-mono text-slate-400">PREMIUM SERVER</span>
+              </div>
+
+              <div class="flex items-baseline justify-between">
+                <div>
+                  <h4 id="advRecName" class="font-display font-extrabold text-3xl text-white">Diamond Plan</h4>
+                  <p id="advRecDesc" class="text-xs text-slate-400 mt-0.5">Ideal for active SMPs & medium communities</p>
+                </div>
+                <div class="text-right">
+                  <div id="advRecPrice" class="font-mono font-extrabold text-3xl text-cyan-400">$2.70</div>
+                  <div class="text-[11px] font-mono text-slate-400">per month</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 pt-2 text-center font-mono text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-slate-400 text-[10px]">RAM</div>
+                  <div id="advRecRam" class="font-bold text-white mt-0.5">8GB RAM</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-slate-400 text-[10px]">CPU</div>
+                  <div id="advRecCpu" class="font-bold text-cyan-400 mt-0.5">150% CPU</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-slate-400 text-[10px]">STORAGE</div>
+                  <div id="advRecDisk" class="font-bold text-purple-400 mt-0.5">25GB NVMe</div>
+                </div>
+              </div>
+
+              <button id="advOrderBtn" onclick="openOrderModal('diamond')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-display font-bold text-sm hover:brightness-110 transition flex items-center justify-center gap-2">
+                <span>Configure & Deploy This Plan</span>
+                <i data-lucide="rocket" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE CONTROL PANEL PREVIEW -->
+    <section id="panel-preview" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="text-xs font-mono uppercase text-purple-400">Custom Pterodactyl Control Center</span>
+        <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-white mt-1">FULL TERMINAL CONTROL AT YOUR FINGERTIPS</h2>
+        <p class="text-slate-400 text-sm mt-2">Test our live interactive console below — start, restart, or execute commands in real time.</p>
+      </div>
+
+      <div class="glass rounded-2xl border border-slate-800 overflow-hidden shadow-2xl">
+        <!-- Top Bar -->
+        <div class="bg-slate-950 px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span id="consoleStatusDot" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-mono font-bold text-sm text-white">srv-tian-diamond-01</span>
+            <span id="consoleStatusBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">RUNNING</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="consoleAction('start')" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-mono font-semibold transition">Start</button>
+            <button onclick="consoleAction('restart')" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-mono font-semibold transition">Restart</button>
+            <button onclick="consoleAction('stop')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-xs font-mono font-semibold transition">Stop</button>
+          </div>
+        </div>
+
+        <!-- Console Output & Command Input -->
+        <div class="p-5 bg-slate-950/90 font-mono text-xs space-y-4">
+          <div id="consoleOutput" class="h-56 overflow-y-auto space-y-1.5 text-slate-300 pr-2">
+            <div class="text-slate-500">[11:00:01 INFO]: Starting TIAN HOSTING Container Daemon v3.11...</div>
+            <div class="text-cyan-400">[11:00:02 INFO]: Allocating 8192MB DDR5 RAM & NVMe Gen4 Volume...</div>
+            <div class="text-slate-300">[11:00:03 INFO]: Loading Paper 1.21.1-R0.1-SNAPSHOT...</div>
+            <div class="text-emerald-400">[11:00:05 INFO]: Done (2.142s)! For help, type "help" or "tps"</div>
+          </div>
+
+          <form onsubmit="sendConsoleCommand(event)" class="flex gap-2 pt-2 border-t border-slate-800">
+            <span class="text-cyan-400 font-bold self-center">$</span>
+            <input id="consoleInput" type="text" placeholder="Type a server command (e.g. tps, version, list, help)..." class="flex-grow bg-transparent text-white focus:outline-none font-mono text-xs" />
+            <button type="submit" class="px-4 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold text-xs hover:brightness-110 transition">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFRASTRUCTURE FEATURES -->
+    <section id="features" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass p-6 rounded-2xl border border-slate-800/80 space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-display font-bold text-lg text-white">L3/L4/L7 DDoS Shield</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">Automated packet inspection tuned specifically for Minecraft TCP/UDP handshakes and Discord gateway traffic.</p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border border-slate-800/80 space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-display font-bold text-lg text-white">Dedicated vCore Allocation</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">Up to 600% high-clock CPU allocation on Infinity plans so heavy world generation never drops your TPS.</p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border border-slate-800/80 space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-display font-bold text-lg text-white">1-Click Mod & Version Switch</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">Install Paper, Purpur, Velocity, Forge, Fabric, Node.js 20+, or Python 3.12 directly from your control panel.</p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border border-slate-800/80 space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <i data-lucide="headphones" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-display font-bold text-lg text-white">24/7 Discord Ticket Support</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">Direct access to our engineering team on Discord for instant server setup, migration, and billing support.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="relative z-10 border-t border-slate-800/80 bg-slate-950/90 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+          <i data-lucide="cpu" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="font-display font-bold text-white">TIAN HOSTING</span>
+          <p class="text-xs text-slate-500">© 2026 TIAN HOSTING Cloud Infrastructure. All rights reserved.</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-xs font-mono">
+        <a id="footerDiscordLink" href="https://discord.gg/tianhosting" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/25 transition inline-flex items-center gap-2">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span>Official Support Discord</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: SERVER CONFIGURATION & ORDER INVOICE GENERATOR   -->
+  <!-- ========================================================= -->
+  <div id="orderModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-cyan-500/30 shadow-2xl space-y-6 my-8">
+      <div class="flex items-start justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <span id="modalPlanBadge" class="text-[11px] font-mono uppercase px-2.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">PREMIUM SERVER</span>
+          <h3 id="modalPlanTitle" class="font-display font-extrabold text-2xl text-white mt-1">Diamond Plan</h3>
+          <p id="modalPlanSpecs" class="text-xs font-mono text-slate-400">8GB RAM | 150% CPU | 25GB NVMe</p>
+        </div>
+        <button onclick="closeOrderModal()" class="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Configuration Inputs -->
+      <div class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Server / Bot Name</label>
+          <input id="orderServerName" type="text" placeholder="e.g. TianSMP Network or ModerationBot" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:border-cyan-400 focus:outline-none" />
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Node Location</label>
+            <select id="orderRegion" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:border-cyan-400 focus:outline-none">
+              <option value="Frankfurt, Germany (EU)">🇩🇪 Frankfurt, Germany (Low Ping)</option>
+              <option value="Helsinki, Finland (EU)">🇫🇮 Helsinki, Finland</option>
+              <option value="New York, USA (NA)">🇺🇸 New York, USA</option>
+              <option value="Singapore (ASIA)">🇸🇬 Singapore</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono uppercase text-slate-300 mb-1.5">Runtime / Engine</label>
+            <select id="orderSoftware" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:border-cyan-400 focus:outline-none">
+              <option value="PaperMC / Purpur (Minecraft)">PaperMC / Purpur (Minecraft)</option>
+              <option value="Forge / Fabric Modded">Forge / Fabric Modded</option>
+              <option value="BungeeCord / Velocity Proxy">Velocity / BungeeCord</option>
+              <option value="Node.js (Discord.js Bot)">Node.js (Discord.js Bot)</option>
+              <option value="Python 3.12 (Discord.py Bot)">Python 3.12 (Discord.py Bot)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Generated Invoice Preview -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-mono uppercase text-cyan-400">Ready-to-Send Ticket Invoice</label>
+            <span id="orderTotalPriceTag" class="text-sm font-mono font-bold text-emerald-400">$2.70 / month</span>
+          </div>
+          <textarea id="orderInvoiceText" readonly rows="6" class="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300 focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <button onclick="copyInvoiceAndOpenDiscord()" class="flex-1 py-3.5 px-5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-display font-bold text-sm hover:brightness-110 transition flex items-center justify-center gap-2">
+          <i data-lucide="copy-check" class="w-4 h-4"></i>
+          <span>Copy Invoice & Open Support Discord</span>
+        </button>
+        <button onclick="justCopyInvoice()" class="py-3.5 px-4 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 hover:text-white font-mono text-xs transition">
+          Copy Text Only
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: OWNER ADMIN PANEL (ONLY FOR kareemwael0213@gmail.com) -->
+  <!-- ========================================================= -->
+  <div id="ownerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-amber-500/40 owner-glow space-y-6 my-8">
+      <div class="flex items-start justify-between gap-4 border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+            <i data-lucide="crown" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-extrabold text-2xl text-white">OWNER CONTROL CENTER</h3>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">VERIFIED OWNER</span>
+            </div>
+            <p class="text-xs font-mono text-slate-400">Authenticated as: <span class="text-amber-300">kareemwael0213@gmail.com</span></p>
+          </div>
+        </div>
+        <button onclick="closeOwnerModal()" class="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Owner Settings Form -->
+      <div class="space-y-4 text-left">
+        <div class="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-4">
+          <div>
+            <label class="block text-xs font-mono uppercase text-amber-400 mb-1.5">
+              Discord Support / Ticket Invite URL (Live Across Platform)
+            </label>
+            <div class="flex gap-2">
+              <input id="ownerDiscordInput" type="url" placeholder="https://discord.gg/your-invite-code" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-mono focus:border-amber-400 focus:outline-none" />
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">
+              All "Join Support Discord", "Contact Support", and "Copy Invoice & Open Support Discord" buttons will immediately point to this link.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono uppercase text-cyan-400 mb-1.5">
+              Top Announcement Banner Message
+            </label>
+            <input id="ownerAnnouncementInput" type="text" placeholder="Instant Deployment on Ryzen 9 7950X Nodes..." class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:border-cyan-400 focus:outline-none" />
+          </div>
+
+          <button onclick="saveOwnerSettings()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-display font-bold text-sm hover:brightness-110 transition flex items-center justify-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Save & Publish Live to Firebase</span>
+          </button>
+        </div>
+
+        <!-- Recent Customer Orders Feed from Firebase -->
+        <div class="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono uppercase text-slate-300 font-bold">Recent Customer Invoice Requests</span>
+            <span id="ordersCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-400">Live Sync</span>
+          </div>
+          <div id="ownerOrdersList" class="max-h-48 overflow-y-auto space-y-2 text-xs font-mono text-slate-300">
+            <div class="text-slate-500 py-2">No recent orders recorded yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-5 right-5 z-50 hidden items-center gap-3 px-4 py-3 rounded-2xl glass border border-cyan-500/40 text-white text-xs sm:text-sm font-medium shadow-2xl">
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+    <span id="toastMessage">Action completed successfully!</span>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- APPLICATION LOGIC + FIREBASE AUTH & REALTIME DATABASE     -->
+  <!-- ========================================================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+    import { 
+      getAuth, 
+      GoogleAuthProvider, 
+      signInWithPopup, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { 
+      getDatabase, 
+      ref, 
+      set, 
+      push, 
+      onValue 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // Your exact Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC0lwVRTBPA3yxnZ3wuqvyfQJbJP-AVNJo",
+      authDomain: "kareem-8ed77.firebaseapp.com",
+      databaseURL: "https://kareem-8ed77-default-rtdb.firebaseio.com",
+      projectId: "kareem-8ed77",
+      storageBucket: "kareem-8ed77.firebasestorage.app",
+      messagingSenderId: "557227389584",
+      appId: "1:557227389584:web:f8ffa9c5913ef54c919e15",
+      measurementId: "G-919VM45PXW"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    isSupported().then((yes) => { if (yes) getAnalytics(app); }).catch(() => {});
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // Owner Email Constant
+    const OWNER_EMAIL = "kareemwael0213@gmail.com";
+
+    // Global State
+    let currentUser = null;
+    let isOwner = false;
+    let supportDiscordLink = localStorage.getItem("tian_discord_link") || "https://discord.gg/tianhosting";
+    let announcementBanner = localStorage.getItem("tian_announcement") || "Instant Deployment on Ryzen 9 7950X Nodes • Enterprise DDoS Protection Included!";
+    let currentCurrency = "USD";
+    let billingMonths = 1;
+    let selectedPlanForOrder = null;
+
+    const currencyRates = {
+      USD: { symbol: "$", rate: 1, pos: "prefix" },
+      EGP: { symbol: " EGP", rate: 50, pos: "suffix" },
+      SAR: { symbol: " SAR", rate: 3.75, pos: "suffix" }
+    };
+
+    // Exact Plans Data from User Specification
+    const PLANS = [
+      // TIAN HOSTING PREMIUM PLANS
+      { id: "dirt", category: "premium", name: "Dirt Plan", ram: "2GB RAM", cpu: "50% CPU", disk: "8GB NVMe", price: 0.60, badge: "Starter", accent: "cyan", desc: "Great for light survival with friends" },
+      { id: "stone", category: "premium", name: "Stone Plan", ram: "4GB RAM", cpu: "80% CPU", disk: "12GB NVMe", price: 1.20, badge: "Budget", accent: "cyan", desc: "Smooth vanilla & basic plugins" },
+      { id: "iron", category: "premium", name: "Iron Plan", ram: "6GB RAM", cpu: "100% CPU", disk: "20GB NVMe", price: 2.10, badge: "Value", accent: "cyan", desc: "Ideal for small community servers" },
+      { id: "diamond", category: "premium", name: "Diamond Plan", ram: "8GB RAM", cpu: "150% CPU", disk: "25GB NVMe", price: 2.70, badge: "Most Popular", popular: true, accent: "cyan", desc: "Best seller for active SMPs & plugins" },
+      { id: "blaze", category: "premium", name: "Blaze Plan", ram: "12GB RAM", cpu: "200% CPU", disk: "35GB NVMe", price: 6.00, badge: "High Performance", accent: "cyan", desc: "Built for heavy plugins & modpacks" },
+      { id: "netherite", category: "premium", name: "Netherite Plan", ram: "16GB RAM", cpu: "280% CPU", disk: "50GB NVMe", price: 9.60, badge: "Pro Network", accent: "cyan", desc: "High player count & multi-world servers" },
+      { id: "titan", category: "premium", name: "Titan Plan", ram: "32GB RAM", cpu: "400% CPU", disk: "70GB NVMe", price: 13.25, badge: "Extreme", accent: "cyan", desc: "Massive networks & large modpacks" },
+      { id: "infinity", category: "premium", name: "Infinity Plan", ram: "64GB RAM", cpu: "600% CPU", disk: "100GB NVMe", price: 16.85, badge: "Flagship", popular: true, accent: "cyan", desc: "Maximum raw hardware power without limits" },
+
+      // TIAN HOSTING - DISCORD BOT PLANS
+      { id: "bot-starter", category: "bot", name: "Bot Starter", ram: "512MB RAM", cpu: "50% CPU", disk: "2GB NVMe", price: 0.50, badge: "Micro Bot", accent: "purple", desc: "Perfect for single-server utility bots" },
+      { id: "bot-standard", category: "bot", name: "Bot Standard", ram: "1GB RAM", cpu: "100% CPU", disk: "5GB NVMe", price: 1.00, badge: "Popular Bot", popular: true, accent: "purple", desc: "Ideal for moderation, ticket & economy bots" },
+      { id: "bot-pro", category: "bot", name: "Bot Pro", ram: "2GB RAM", cpu: "150% CPU", disk: "10GB NVMe", price: 2.00, badge: "Multi-Guild", accent: "purple", desc: "Great for AI integrations & music bots" },
+      { id: "bot-ultra", category: "bot", name: "Bot Ultra", ram: "4GB RAM", cpu: "200% CPU", disk: "20GB NVMe", price: 4.00, badge: "Sharded Bot", accent: "purple", desc: "High-concurrency verified bots & Lavalink" }
+    ];
+
+    // Format Price Helper
+    function formatPrice(usdAmount) {
+      const discount = billingMonths === 3 ? 0.95 : billingMonths === 12 ? 0.85 : 1;
+      const finalUsd = usdAmount * billingMonths * discount;
+      const curr = currencyRates[currentCurrency];
+      const converted = (finalUsd * curr.rate).toFixed(2);
+      return curr.pos === "prefix" ? `${curr.symbol}${converted}` : `${converted}${curr.symbol}`;
+    }
+
+    function getBillingLabel() {
+      if (billingMonths === 1) return "/ month";
+      if (billingMonths === 3) return "/ quarter (-5%)";
+      return "/ year (-15%)";
+    }
+
+    // Render Plans Grids
+    function renderPlans() {
+      const premiumGrid = document.getElementById("premiumPlansGrid");
+      const botGrid = document.getElementById("botPlansGrid");
+
+      premiumGrid.innerHTML = "";
+      botGrid.innerHTML = "";
+
+      PLANS.forEach((plan) => {
+        const isBot = plan.category === "bot";
+        const borderClass = plan.popular
+          ? (isBot ? "border-purple-500/60 shadow-lg shadow-purple-500/10" : "border-cyan-400/60 shadow-lg shadow-cyan-500/10")
+          : "border-slate-800/90";
+
+        const badgeBg = isBot
+          ? "bg-purple-500/15 text-purple-300 border-purple-500/30"
+          : "bg-cyan-500/15 text-cyan-300 border-cyan-500/30";
+
+        const btnClass = plan.popular
+          ? (isBot
+              ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold"
+              : "bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-bold")
+          : "bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-semibold";
+
+        const cardHTML = `
+          <div class="plan-card glass rounded-2xl p-6 border ${borderClass} flex flex-col justify-between relative overflow-hidden">
+            ${plan.popular ? `<div class="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r ${isBot ? 'from-purple-500 to-indigo-500 text-white' : 'from-cyan-400 to-blue-500 text-slate-950'} text-[10px] font-mono font-extrabold uppercase rounded-bl-xl">BEST VALUE</div>` : ""}
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${badgeBg}">${plan.badge}</span>
+              </div>
+              <h4 class="font-display font-extrabold text-xl text-white">${plan.name}</h4>
+              <p class="text-xs text-slate-400 mt-1 min-h-[32px]">${plan.desc}</p>
+
+              <div class="my-5 pb-5 border-b border-slate-800/90">
+                <div class="font-mono font-extrabold text-3xl ${isBot ? 'text-purple-400' : 'text-cyan-400'}">${formatPrice(plan.price)}</div>
+                <div class="text-[11px] font-mono text-slate-400 mt-0.5">${getBillingLabel()}</div>
+              </div>
+
+              <ul class="space-y-2.5 text-xs font-mono text-slate-200 mb-6">
+                <li class="flex items-center justify-between p-2 rounded-lg bg-slate-950/70 border border-slate-800/70">
+                  <span class="text-slate-400">MEMORY</span>
+                  <span class="font-bold text-white">${plan.ram}</span>
+                </li>
+                <li class="flex items-center justify-between p-2 rounded-lg bg-slate-950/70 border border-slate-800/70">
+                  <span class="text-slate-400">PROCESSOR</span>
+                  <span class="font-bold ${isBot ? 'text-purple-300' : 'text-cyan-300'}">${plan.cpu}</span>
+                </li>
+                <li class="flex items-center justify-between p-2 rounded-lg bg-slate-950/70 border border-slate-800/70">
+                  <span class="text-slate-400">STORAGE</span>
+                  <span class="font-bold text-emerald-300">${plan.disk}</span>
+                </li>
+              </ul>
+            </div>
+
+            <button onclick="openOrderModal('${plan.id}')" class="w-full py-3 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 ${btnClass}">
+              <span>Configure & Order</span>
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+
+        if (isBot) {
+          botGrid.insertAdjacentHTML("beforeend", cardHTML);
+        } else {
+          premiumGrid.insertAdjacentHTML("beforeend", cardHTML);
         }
+      });
 
-        function signWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(e => alert("مشكلة بتسجيل جوجل: " + e.message));
+      lucide.createIcons();
+    }
+
+    // Apply Discord Link & Announcement Everywhere
+    function applySiteSettings() {
+      const linkIds = ["topDiscordLink", "navDiscordBtn", "heroDiscordBtn", "footerDiscordLink"];
+      linkIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.href = supportDiscordLink;
+      });
+      const annEl = document.getElementById("announcementText");
+      if (annEl) annEl.textContent = announcementBanner;
+
+      const ownerDiscordInput = document.getElementById("ownerDiscordInput");
+      const ownerAnnouncementInput = document.getElementById("ownerAnnouncementInput");
+      if (ownerDiscordInput) ownerDiscordInput.value = supportDiscordLink;
+      if (ownerAnnouncementInput) ownerAnnouncementInput.value = announcementBanner;
+    }
+
+    // Listen to Firebase Realtime Database for Live Site Settings
+    const settingsRef = ref(db, "tian_hosting/settings");
+    onValue(settingsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        if (data.discordLink) {
+          supportDiscordLink = data.discordLink;
+          localStorage.setItem("tian_discord_link", supportDiscordLink);
         }
-
-        function signWithEmail(type) {
-            const email = document.getElementById('auth-email').value.trim();
-            const pass = document.getElementById('auth-pass').value;
-            if(!email || !pass) return alert("يرجى كتابة البيانات كاملة أولاً!");
-
-            if(type === 'login') {
-                auth.signInWithEmailAndPassword(email, pass).catch(e => alert("خطأ في تسجيل الدخول: " + e.message));
-            } else {
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .then(() => alert("تم إنشاء الحساب بنجاح في المنصة!"))
-                    .catch(e => alert("خطأ في إنشاء الحساب الجديد: " + e.message));
-            }
+        if (data.announcement) {
+          announcementBanner = data.announcement;
+          localStorage.setItem("tian_announcement", announcementBanner);
         }
+        applySiteSettings();
+      }
+    }, () => {
+      // Fallback if rules require auth
+      applySiteSettings();
+    });
 
-        function logOut() { auth.signOut(); }
+    // Listen to Recent Orders for Owner Modal
+    const ordersRef = ref(db, "tian_hosting/orders");
+    onValue(ordersRef, (snapshot) => {
+      const listEl = document.getElementById("ownerOrdersList");
+      if (!listEl) return;
+      const data = snapshot.val();
+      if (!data) {
+        listEl.innerHTML = `<div class="text-slate-500 py-2">No recent orders recorded yet.</div>`;
+        return;
+      }
+      const entries = Object.values(data).reverse().slice(0, 15);
+      listEl.innerHTML = entries.map(o => `
+        <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-2">
+          <div>
+            <span class="text-cyan-400 font-bold">${o.planName}</span> — <span class="text-white">${o.serverName}</span>
+            <div class="text-[10px] text-slate-400">${o.userEmail || 'Guest Customer'} • ${o.region} •${o.software}</div>
+          </div>
+          <span class="text-emerald-400 font-bold shrink-0">${o.priceDisplay}</span>
+        </div>
+      `).join("");
+    });
 
-        // مراقبة الجلسة والتوجيه بناء على إيميل الأدمن المحدد من قبلك
-        auth.onAuthStateChanged(user => {
-            if(user) {
-                if(user.email === "kareemwael0213@gmail.com") {
-                    changeView('screen-admin');
-                    loadAdminData();
-                } else {
-                    changeView('screen-user');
-                    document.getElementById('user-name').innerText = user.displayName || user.email;
-                    syncUserDashboard(user.uid, user.email);
-                }
-            } else {
-                changeView('screen-auth');
-            }
+    // Google Sign-In Handler
+    window.signInWithGoogle = async function () {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        if (user.email && user.email.toLowerCase() === OWNER_EMAIL) {
+          showToast("Welcome back, Owner Kareem! Owner Control Center unlocked.");
+          openOwnerModal();
+        } else {
+          showToast(`Signed in as ${user.displayName || user.email}`);
+        }
+      } catch (err) {
+        console.error("Google Sign-In Error:", err);
+        showToast("Sign-In popup closed or domain needs to be authorized in Firebase Auth.");
+      }
+    };
+
+    window.logoutUser = async function () {
+      await signOut(auth);
+      showToast("Signed out successfully.");
+    };
+
+    // Monitor Auth State
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const loginBtn = document.getElementById("googleLoginBtn");
+      const profileBox = document.getElementById("userProfileBox");
+      const ownerBtn = document.getElementById("ownerDashboardBtn");
+      const ownerBadge = document.getElementById("ownerBadge");
+
+      if (user) {
+        isOwner = user.email && user.email.toLowerCase() === OWNER_EMAIL;
+        loginBtn.classList.add("hidden");
+        profileBox.classList.remove("hidden");
+        profileBox.classList.add("flex");
+
+        document.getElementById("userAvatar").src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.displayName || "U") + "&background=0D8ABC&color=fff";
+        document.getElementById("userName").textContent = user.displayName || "Client";
+        document.getElementById("userEmail").textContent = user.email;
+
+        if (isOwner) {
+          ownerBtn.classList.remove("hidden");
+          ownerBtn.classList.add("inline-flex");
+          ownerBadge.classList.remove("hidden");
+        } else {
+          ownerBtn.classList.add("hidden");
+          ownerBtn.classList.remove("inline-flex");
+          ownerBadge.classList.add("hidden");
+        }
+      } else {
+        isOwner = false;
+        loginBtn.classList.remove("hidden");
+        profileBox.classList.add("hidden");
+        profileBox.classList.remove("flex");
+        ownerBtn.classList.add("hidden");
+        ownerBtn.classList.remove("inline-flex");
+        ownerBadge.classList.add("hidden");
+      }
+    });
+
+    // Save Owner Settings to Firebase & LocalStorage
+    window.saveOwnerSettings = async function () {
+      if (!isOwner) {
+        showToast("Access Denied: Only kareemwael0213@gmail.com can modify platform settings.");
+        return;
+      }
+      const newLink = document.getElementById("ownerDiscordInput").value.trim() || "https://discord.gg/tianhosting";
+      const newAnn = document.getElementById("ownerAnnouncementInput").value.trim() || announcementBanner;
+
+      supportDiscordLink = newLink;
+      announcementBanner = newAnn;
+      localStorage.setItem("tian_discord_link", supportDiscordLink);
+      localStorage.setItem("tian_announcement", announcementBanner);
+      applySiteSettings();
+
+      try {
+        await set(ref(db, "tian_hosting/settings"), {
+          discordLink: supportDiscordLink,
+          announcement: announcementBanner,
+          updatedBy: currentUser.email,
+          updatedAt: new Date().toISOString()
         });
+        showToast("Discord Support Link & Banner saved live to Firebase!");
+      } catch (e) {
+        showToast("Saved locally & active! (Enable Realtime Database rules for public sync)");
+      }
+      closeOwnerModal();
+    };
 
-        function convertImgToBase64(element) {
-            const file = element.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('view-upload-img').src = e.target.result;
-                    document.getElementById('view-upload-img').style.display = "block";
-                    document.getElementById('up-hint').style.display = "none";
-                    globalBase64Img = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
+    window.openOwnerModal = function () {
+      if (!isOwner) {
+        showToast("Only Owner (kareemwael0213@gmail.com) can access this panel.");
+        return;
+      }
+      applySiteSettings();
+      const modal = document.getElementById("ownerModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
+
+    window.closeOwnerModal = function () {
+      const modal = document.getElementById("ownerModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
+
+    // Currency & Billing Switchers
+    window.setCurrency = function (curr) {
+      currentCurrency = curr;
+      ["USD", "EGP", "SAR"].forEach(c => {
+        const btn = document.getElementById(`curr-${c}`);
+        if (c === curr) {
+          btn.className = "px-2 py-1 rounded bg-cyan-500 text-slate-950 font-bold transition";
+        } else {
+          btn.className = "px-2 py-1 rounded text-slate-400 hover:text-white transition";
         }
+      });
+      renderPlans();
+      updateAdvisor();
+    };
 
-        // مزامنة لوحة العميل وحساب العداد اليومي مع التحديث التلقائي كل 24 ساعة
-        function syncUserDashboard(uid, email) {
-            const uRef = db.ref('users/' + uid);
-            uRef.on('value', snap => {
-                let uData = snap.val();
-                const todayStr = new Date().toISOString().split('T')[0];
-
-                if(!uData) {
-                    uData = { email: email, plan: "none", videos_left_today: 0, last_reset_date: todayStr };
-                    uRef.set(uData);
-                } else if (uData.last_reset_date !== todayStr) {
-                    let limit = 0;
-                    if(uData.plan === 'plan_1') limit = 1;
-                    if(uData.plan === 'plan_2') limit = 2;
-                    if(uData.plan === 'plan_3') limit = 3;
-                    uRef.update({ videos_left_today: limit, last_reset_date: todayStr });
-                }
-
-                const names = { 
-                    "none": "غير مشترك / تجريبي", 
-                    "plan_1": "خطة فيديو في اليوم (300 ج.م)", 
-                    "plan_2": "خطة 2 فيديو في اليوم (600 ج.م)", 
-                    "plan_3": "خطة 3 فيديوهات في اليوم (900 ج.م)" 
-                };
-                document.getElementById('user-plan-txt').innerText = names[uData.plan] || "خطة مخصصة";
-                document.getElementById('user-counter-txt').innerText = uData.videos_left_today;
-            });
+    window.setBillingCycle = function (months) {
+      billingMonths = months;
+      [1, 3, 12].forEach(m => {
+        const btn = document.getElementById(`cycle-${m}`);
+        if (m === months) {
+          btn.className = "px-2.5 py-1 rounded-lg bg-slate-800 text-cyan-400 font-bold";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white";
         }
+      });
+      renderPlans();
+      updateAdvisor();
+    };
 
-        function saveNewApiKey() {
-            const key = document.getElementById('admin-api-key').value.trim();
-            if(!key) return alert("يرجى إدخال مفتاح الـ API أولاً!");
-            db.ref('api_keys').push({ value: key, status: "active" }).then(() => {
-                document.getElementById('admin-api-key').value = "";
-                alert("تمت إضافة الـ API ومزامنته في السيستم كنشط وفوري!");
-            });
+    window.switchCategory = function (cat) {
+      const prem = document.getElementById("premiumSectionWrapper");
+      const bot = document.getElementById("botSectionWrapper");
+
+      ["all", "premium", "bot"].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === cat) {
+          btn.className = "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 transition flex items-center gap-1.5";
+        } else {
+          btn.className = "px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition flex items-center gap-1.5";
         }
+      });
 
-        function loadAdminData() {
-            // جلب وعرض طابور الـ APIs للأدمن
-            db.ref('api_keys').on('value', snap => {
-                const box = document.getElementById('admin-apis-list');
-                box.innerHTML = "";
-                snap.forEach(child => {
-                    const d = child.val();
-                    let statusColor = "var(--success)";
-                    let statusText = "نشط ومتاح في الطابور";
-                    if(d.status === "exhausted") { statusColor = "var(--danger)"; statusText = "رصيده خلص / خطأ بالطلب"; }
-                    
-                    box.innerHTML += `
-                        <div style="background:#26262b; padding:10px; border-radius:6px; margin-bottom:5px; font-size:12px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #3a3a45;">
-                            <span style="font-family:monospace; color:#aaa;">${d.value.substring(0,18)}...</span>
-                            <span style="color:${statusColor}; font-weight:bold;">${statusText}</span>
-                        </div>
-                    `;
-                });
-            });
+      if (cat === "all") {
+        prem.classList.remove("hidden");
+        bot.classList.remove("hidden");
+      } else if (cat === "premium") {
+        prem.classList.remove("hidden");
+        bot.classList.add("hidden");
+      } else {
+        prem.classList.add("hidden");
+        bot.classList.remove("hidden");
+      }
+    };
 
-            // جلب وإدارة المشتركين والتحكم بخططهم فورا من قبل كريم الأدمن
-            db.ref('users').on('value', snap => {
-                const box = document.getElementById('admin-users-list');
-                box.innerHTML = "";
-                snap.forEach(child => {
-                    const uid = child.key;
-                    const u = child.val();
-                    box.innerHTML += `
-                        <div class="user-row" style="padding:15px; margin-bottom:12px; background:#26262b; border-radius:8px;">
-                            <div style="font-size:14px; margin-bottom:8px;"><strong>الحساب:</strong> <span style="color:var(--secondary)">${u.email}</span></div>
-                            <div style="font-size:13px; margin-bottom:10px; color:#aaa;">رصيد اليوم الحالي للعميل: <strong style="color:#fff">${u.videos_left_today}</strong></div>
-                            <div style="display:flex; gap:10px; align-items:center;">
-                                <select id="sel-${uid}" style="margin:0; padding:6px; font-size:13px;">
-                                    <option value="none" ${u.plan==='none'?'selected':''}>إلغاء الاشتراك / تجريبي</option>
-                                    <option value="plan_1" ${u.plan==='plan_1'?'selected':''}>خطة فيديو في اليوم (300 جنيه)</option>
-                                    <option value="plan_2" ${u.plan==='plan_2'?'selected':''}>خطة 2 فيديو في اليوم (600 جنيه)</option>
-                                    <option value="plan_3" ${u.plan==='plan_3'?'selected':''}>خطة 3 فيديوهات في اليوم (900 جنيه)</option>
-                                </select>
-                                <button style="margin:0; width:auto; padding:6px 15px; font-size:13px; background:var(--success);" onclick="executePlanUpdate('${uid}')">تحديث الخطة</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
+    // Smart Advisor Logic
+    let advMode = "server";
+    let advComplexity = 2;
+
+    window.setAdvisorMode = function (mode) {
+      advMode = mode;
+      const srvBtn = document.getElementById("adv-mode-server");
+      const botBtn = document.getElementById("adv-mode-bot");
+      const sliderLabel = document.getElementById("advSliderLabel");
+      const compLabel = document.getElementById("advComplexityLabel");
+
+      if (mode === "server") {
+        srvBtn.className = "p-3.5 rounded-xl border border-cyan-500 bg-cyan-500/15 text-white font-semibold text-sm flex items-center justify-center gap-2 transition";
+        botBtn.className = "p-3.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-300 hover:text-white font-semibold text-sm flex items-center justify-center gap-2 transition";
+        sliderLabel.textContent = "2. Estimated Concurrent Players";
+        compLabel.textContent = "3. Plugins / Modpack Load";
+      } else {
+        botBtn.className = "p-3.5 rounded-xl border border-purple-500 bg-purple-500/15 text-white font-semibold text-sm flex items-center justify-center gap-2 transition";
+        srvBtn.className = "p-3.5 rounded-xl border border-slate-800 bg-slate-900/70 text-slate-300 hover:text-white font-semibold text-sm flex items-center justify-center gap-2 transition";
+        sliderLabel.textContent = "2. Discord Servers (Guilds) Scale";
+        compLabel.textContent = "3. Bot Features (Music / AI / Shards)";
+      }
+      updateAdvisor();
+    };
+
+    window.setAdvisorComplexity = function (level) {
+      advComplexity = level;
+      [1, 2, 3].forEach(l => {
+        const btn = document.getElementById(`adv-comp-${l}`);
+        if (l === level) {
+          btn.className = "p-2.5 rounded-xl border border-cyan-500 bg-cyan-500/15 text-white font-bold";
+        } else {
+          btn.className = "p-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 font-medium";
         }
+      });
+      updateAdvisor();
+    };
 
-        function executePlanUpdate(uid) {
-            const plan = document.getElementById('sel-'+uid).value;
-            let limit = 0;
-            if(plan === "plan_1") limit = 1;
-            if(plan === "plan_2") limit = 2;
-            if(plan === "plan_3") limit = 3;
-            db.ref('users/' + uid).update({ plan: plan, videos_left_today: limit }).then(() => alert("تم تحديث خطة المشترك بنجاح وتصفير رصيده اليومي الجديد!"));
-        }
+    window.updateAdvisor = function () {
+      const sliderVal = parseInt(document.getElementById("advSlider").value, 10);
+      const valLabel = document.getElementById("advSliderValue");
+      let recPlan;
 
-        // ==================== [ محرك الإنتاج الذكي والدوران التلقائي على الـ APIs ] ====================
-        async function startGeneratingProcess() {
-            const prompt = document.getElementById('video-prompt-input').value.trim();
-            const loader = document.getElementById('main-loader');
-            const resBox = document.getElementById('video-result-box');
-            const debugBox = document.getElementById('debug-log-box');
+      if (advMode === "server") {
+        valLabel.textContent = `${sliderVal} Players`;
+        const score = sliderVal * advComplexity;
+        if (score <= 20) recPlan = PLANS.find(p => p.id === "dirt");
+        else if (score <= 45) recPlan = PLANS.find(p => p.id === "stone");
+        else if (score <= 75) recPlan = PLANS.find(p => p.id === "iron");
+        else if (score <= 130) recPlan = PLANS.find(p => p.id === "diamond");
+        else if (score <= 220) recPlan = PLANS.find(p => p.id === "blaze");
+        else if (score <= 350) recPlan = PLANS.find(p => p.id === "netherite");
+        else if (score <= 520) recPlan = PLANS.find(p => p.id === "titan");
+        else recPlan = PLANS.find(p => p.id === "infinity");
+      } else {
+        valLabel.textContent = `${sliderVal * 2} Guilds`;
+        const score = sliderVal * advComplexity;
+        if (score <= 40) recPlan = PLANS.find(p => p.id === "bot-starter");
+        else if (score <= 120) recPlan = PLANS.find(p => p.id === "bot-standard");
+        else if (score <= 260) recPlan = PLANS.find(p => p.id === "bot-pro");
+        else recPlan = PLANS.find(p => p.id === "bot-ultra");
+      }
 
-            if(!prompt) return alert("يرجى كتابة وصف المشهد أولاً!");
+      document.getElementById("advRecCategory").textContent = recPlan.category === "bot" ? "DISCORD BOT PLAN" : "PREMIUM SERVER PLAN";
+      document.getElementById("advRecName").textContent = recPlan.name;
+      document.getElementById("advRecDesc").textContent = recPlan.desc;
+      document.getElementById("advRecPrice").textContent = formatPrice(recPlan.price);
+      document.getElementById("advRecRam").textContent = recPlan.ram;
+      document.getElementById("advRecCpu").textContent = recPlan.cpu;
+      document.getElementById("advRecDisk").textContent = recPlan.disk;
+      document.getElementById("advOrderBtn").setAttribute("onclick", `openOrderModal('${recPlan.id}')`);
+    };
 
-            resBox.innerHTML = "";
-            debugBox.style.display = "none";
-            debugBox.innerHTML = "";
-            loader.style.display = "block";
+    // Order Modal & Invoice Generation
+    window.openOrderModal = function (planId) {
+      selectedPlanForOrder = PLANS.find(p => p.id === planId) || PLANS[3];
+      document.getElementById("modalPlanBadge").textContent = selectedPlanForOrder.category === "bot" ? "DISCORD BOT HOSTING" : "PREMIUM GAME SERVER";
+      document.getElementById("modalPlanTitle").textContent = selectedPlanForOrder.name;
+      document.getElementById("modalPlanSpecs").textContent = `${selectedPlanForOrder.ram} | ${selectedPlanForOrder.cpu} \vert{}${selectedPlanForOrder.disk}`;
+      document.getElementById("orderTotalPriceTag").textContent = `${formatPrice(selectedPlanForOrder.price)}${getBillingLabel()}`;
 
-            const user = auth.currentUser;
-            const uSnap = await db.ref('users/' + user.uid).get();
-            const uData = uSnap.val();
+      const softwareSelect = document.getElementById("orderSoftware");
+      if (selectedPlanForOrder.category === "bot") {
+        softwareSelect.value = "Node.js (Discord.js Bot)";
+      } else {
+        softwareSelect.value = "PaperMC / Purpur (Minecraft)";
+      }
 
-            if(!uData || uData.videos_left_today <= 0) {
-                loader.style.display = "none";
-                return alert("عذراً! ليس لديك رصيد كافي لتوليد الفيديوهات اليوم. يرجى الاشتراك أو تجديد باقتك.");
-            }
+      refreshInvoiceText();
+      const modal = document.getElementById("orderModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
 
-            const apiSnap = await db.ref('api_keys').once('value');
-            if(!apiSnap.exists()) {
-                loader.style.display = "none";
-                return alert("لا توجد أي مفاتيح API مضافة بالنظام حالياً من قبل الأدمن.");
-            }
+    window.closeOrderModal = function () {
+      const modal = document.getElementById("orderModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
 
-            const apis = apiSnap.val();
-            let successResultText = null;
-            let activeUsedKey = null;
+    function refreshInvoiceText() {
+      if (!selectedPlanForOrder) return;
+      const srvName = document.getElementById("orderServerName").value.trim() || "MyTianServer";
+      const region = document.getElementById("orderRegion").value;
+      const software = document.getElementById("orderSoftware").value;
+      const clientEmail = currentUser ? currentUser.email : "Guest (Not Signed In)";
+      const priceStr = `${formatPrice(selectedPlanForOrder.price)}${getBillingLabel()}`;
 
-            // 🔄 الدوران الذكي (Loop) على المفاتيح: لو مفتاح فشل أو رصيده خلص، بيعطله تلقائياً ويروح للي بعده فورا
-            for (let id in apis) {
-                if (apis[id].status === "active") {
-                    try {
-                        const myHeaders = new Headers();
-                        myHeaders.append("Authorization", `Bearer ${apis[id].value}`);
-                        myHeaders.append("Content-Type", "application/json");
+      const invoice = 
+`╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+┃         TIAN HOSTING - NEW ORDER           ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ • Plan: ${selectedPlanForOrder.name} (${selectedPlanForOrder.ram} | ${selectedPlanForOrder.cpu} \vert{}${selectedPlanForOrder.disk})
+┃ • Server/Bot Name: ${srvName}
+┃ • Location: ${region}
+┃ • Engine: ${software}
+┃ • Billing Price: ${priceStr}
+┃ • Client Account: ${clientEmail}
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯`;
 
-                        const modelSelected = globalBase64Img ? "grok-imagine/image-to-video" : "grok-imagine/text-to-video";
+      document.getElementById("orderInvoiceText").value = invoice;
+    }
 
-                        // الإعدادات المطلوبة بدقة: 10 ثواني ودقة 480p كما حددت
-                        const inputData = {
-                            "prompt": prompt,
-                            "aspect_ratio": "16:9",
-                            "mode": "normal",
-                            "duration": "10", 
-                            "resolution": "480p"
-                        };
+    ["orderServerName", "orderRegion", "orderSoftware"].forEach(id => {
+      document.getElementById(id).addEventListener("input", refreshInvoiceText);
+      document.getElementById(id).addEventListener("change", refreshInvoiceText);
+    });
 
-                        if (globalBase64Img) {
-                            inputData["image_url"] = globalBase64Img;
-                        }
+    window.copyInvoiceAndOpenDiscord = async function () {
+      refreshInvoiceText();
+      const text = document.getElementById("orderInvoiceText").value;
+      await navigator.clipboard.writeText(text);
 
-                        const rawBody = JSON.stringify({
-                            "model": modelSelected,
-                            "callBackUrl": "https://kimo-tecnology.firebaseapp.com/api/callback",
-                            "input": inputData
-                        });
+      // Log order to Firebase for Owner visibility
+      try {
+        await push(ref(db, "tian_hosting/orders"), {
+          planName: selectedPlanForOrder.name,
+          serverName: document.getElementById("orderServerName").value.trim() || "MyTianServer",
+          region: document.getElementById("orderRegion").value,
+          software: document.getElementById("orderSoftware").value,
+          priceDisplay: `${formatPrice(selectedPlanForOrder.price)}${getBillingLabel()}`,
+          userEmail: currentUser ? currentUser.email : "Guest",
+          createdAt: new Date().toISOString()
+        });
+      } catch (_) {}
 
-                        const requestOptions = {
-                            method: "POST",
-                            headers: myHeaders,
-                            body: rawBody,
-                            redirect: "follow"
-                        };
+      showToast("Invoice copied! Redirecting to Support Discord...");
+      setTimeout(() => {
+        window.open(supportDiscordLink, "_blank", "noopener,noreferrer");
+      }, 600);
+    };
 
-                        debugBox.style.display = "block";
-                        debugBox.innerText += `\n[محاولة الاتصال بالمفتاح الحالي]: ${apis[id].value.substring(0,15)}...\n`;
+    window.justCopyInvoice = async function () {
+      refreshInvoiceText();
+      const text = document.getElementById("orderInvoiceText").value;
+      await navigator.clipboard.writeText(text);
+      showToast("Order invoice copied to clipboard!");
+    };
 
-                        let response = await fetch("https://api.kie.ai/api/v1/jobs/createTask", requestOptions);
-                        let resultText = await response.text();
+    // Interactive Console Simulator
+    window.consoleAction = function (action) {
+      const out = document.getElementById("consoleOutput");
+      const dot = document.getElementById("consoleStatusDot");
+      const badge = document.getElementById("consoleStatusBadge");
 
-                        if (response.status === 200 || response.status === 201) {
-                            successResultText = resultText;
-                            activeUsedKey = apis[id].value;
-                            break; // نجح الاتصال! نخرج فورا من طابور الفحص ونبدأ المعالجة
-                        } else {
-                            // 🛑 إذا جاب أي كود خطأ أو نفاذ كريديت من السيرفر الخارجي، عطل المفتاح فوراً في السيستم
-                            debugBox.innerText += `❌ فشل المفتاح الحالي (كود الاستجابة: ${response.status}). يتم الانتقال للمفتاح التالي فورا...\n`;
-                            await db.ref(`api_keys/${id}`).update({ status: "exhausted" });
-                        }
-                    } catch (err) {
-                        debugBox.innerText += `⚠️ عطل اتصال بالشبكة للمفتاح الحالي: ${err.message}. يتم التخطي...\n`;
-                        await db.ref(`api_keys/${id}`).update({ status: "exhausted" });
-                    }
-                }
-            }
+      if (action === "start") {
+        dot.className = "w-3 h-3 rounded-full bg-emerald-400 animate-pulse";
+        badge.className = "text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30";
+        badge.textContent = "RUNNING";
+        out.insertAdjacentHTML("beforeend", `<div class="text-emerald-400">[SYSTEM]: Container started successfully. Server is online!</div>`);
+      } else if (action === "restart") {
+        out.insertAdjacentHTML("beforeend", `<div class="text-amber-400">[SYSTEM]: Restarting container srv-tian-diamond-01... Done (1.4s)!</div>`);
+      } else {
+        dot.className = "w-3 h-3 rounded-full bg-rose-500";
+        badge.className = "text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/30";
+        badge.textContent = "OFFLINE";
+        out.insertAdjacentHTML("beforeend", `<div class="text-rose-400">[SYSTEM]: Saving chunks and stopping server...</div>`);
+      }
+      out.scrollTop = out.scrollHeight;
+    };
 
-            loader.style.display = "none";
+    window.sendConsoleCommand = function (e) {
+      e.preventDefault();
+      const input = document.getElementById("consoleInput");
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      const out = document.getElementById("consoleOutput");
+      out.insertAdjacentHTML("beforeend", `<div class="text-white">&gt; ${cmd}</div>`);
 
-            if(successResultText) {
-                // 🛡️ الأمان المالي: الخصم من عداد المشترك داخل موقعك يتم فقط عند استلام الـ Task بنجاح تام
-                await db.ref('users/' + user.uid).update({
-                    videos_left_today: uData.videos_left_today - 1
-                });
+      const lower = cmd.toLowerCase();
+      if (lower === "tps") {
+        out.insertAdjacentHTML("beforeend", `<div class="text-emerald-400">[Server]: TPS from last 1m, 5m, 15m: *20.0, *20.0, *20.0</div>`);
+      } else if (lower === "list") {
+        out.insertAdjacentHTML("beforeend", `<div class="text-cyan-400">[Server]: There are 18 of a max of 100 players online.</div>`);
+      } else if (lower === "version") {
+        out.insertAdjacentHTML("beforeend", `<div class="text-purple-400">[Server]: This server is running Paper version 1.21.1-R0.1-SNAPSHOT (TIAN-Optimized)</div>`);
+      } else {
+        out.insertAdjacentHTML("beforeend", `<div class="text-slate-400">[Server]: Executed command "${cmd}" (TPS: 20.0 | MSPT: 4.2ms)</div>`);
+      }
+      input.value = "";
+      out.scrollTop = out.scrollHeight;
+    };
 
-                const responseData = JSON.parse(successResultText);
-                const taskId = responseData.data.taskId;
+    // Toast Helper
+    window.showToast = function (msg) {
+      const box = document.getElementById("toastBox");
+      document.getElementById("toastMessage").textContent = msg;
+      box.classList.remove("hidden");
+      box.classList.add("flex");
+      setTimeout(() => {
+        box.classList.add("hidden");
+        box.classList.remove("flex");
+      }, 4000);
+    };
 
-                debugBox.innerText += `\n✅ نجاح إنتاج المهمة بالسيرفر الخارجي! الـ Task ID هو: ${taskId}\n`;
+    // Live CPU Telemetry Animation
+    setInterval(() => {
+      const val = (20 + Math.random() * 12).toFixed(1);
+      const cpuVal = document.getElementById("heroCpuVal");
+      const cpuBar = document.getElementById("heroCpuBar");
+      if (cpuVal && cpuBar) {
+        cpuVal.textContent = `${val}%`;
+        cpuBar.style.width = `${val}%`;
+      }
+    }, 2500);
 
-                resBox.innerHTML = `
-                    <p style="color:var(--success); font-weight:bold; margin-bottom:5px;">🎉 تم قبول طلبك وبدء المعالجة الذكية بالسيرفر بنجاح!</p>
-                    <div id="status-container" style="background:#26262b; padding:15px; border-radius:8px; margin-top:10px; border:1px solid #3a3a45;">
-                        <p id="status-text"><i class="fa-solid fa-circle-notch fa-spin" style="color:var(--secondary)"></i> جاري معالجة الكليب وتوليده في السيرفر التابع لـ kie.ai الآن... (فحص تلقائي)</p>
-                    </div>
-                `;
-                
-                globalBase64Img = null;
-                document.getElementById('view-upload-img').style.display = "none";
-                document.getElementById('up-hint').style.display = "block";
-                document.getElementById('video-prompt-input').value = "";
-
-                startPolling(taskId, activeUsedKey);
-
-            } else {
-                alert("للأسف، جميع مفاتيح الـ API المتاحة في لوحة الأدمن مستهلكة بالكامل أو غير صالحة حالياً! يرجى إبلاغ الإدارة لتحديث الأكواد.");
-            }
-        }
-
-        // ==================== [ نظام الفحص المرن والقابل للتخصيص بدون خسارة سنت واحد ] ====================
-        function startPolling(taskId, apiKey) {
-            const statusText = document.getElementById('status-text');
-            const statusContainer = document.getElementById('status-container');
-            const debugBox = document.getElementById('debug-log-box');
-
-            // ⚙️ لوحة تحكم الفحص: (قم بتغييرها هنا فوراً بناء على توثيق الدعم الفني لـ kie.ai بدون خوف)
-            const CHECK_METHOD = "POST"; 
-            const CHECK_URL = "https://api.kie.ai/api/v1/jobs/status"; 
-
-            const checkInterval = setInterval(async () => {
-                try {
-                    const myHeaders = new Headers();
-                    myHeaders.append("Authorization", `Bearer ${apiKey}`);
-                    myHeaders.append("Content-Type", "application/json");
-
-                    let requestOptions = {
-                        method: CHECK_METHOD,
-                        headers: myHeaders,
-                        redirect: "follow"
-                    };
-
-                    let finalUrl = CHECK_URL;
-
-                    if (CHECK_METHOD === "POST") {
-                        requestOptions.body = JSON.stringify({ "taskId": taskId });
-                    } else if (CHECK_METHOD === "GET") {
-                        // إذا طلبوا إضافة الآيدي في نهاية الرابط: finalUrl = `${CHECK_URL}/${taskId}`;
-                        // إذا طلبوا إضافة الآيدي كـ Parameter: finalUrl = `${CHECK_URL}?taskId=${taskId}`;
-                    }
-
-                    let response = await fetch(finalUrl, requestOptions);
-                    let resultText = await response.text();
-                    
-                    debugBox.innerText += `\n[تحديث الفحص الدوري - الكود: ${response.status}]: ${resultText}\n`;
-
-                    if (response.status === 404) {
-                        statusText.innerHTML = `<span style="color:var(--warning)"><i class="fa-solid fa-triangle-exclamation"></i> تم إرسال الفيديو وجاري معالجته، ولكن مسار الفحص الدوري المكتوب بالدالة يعطي (404 Not Found). الفيديو يتم إنتاجه على حسابك الخارجي بالفعل.</span>`;
-                        return; 
-                    }
-
-                    let taskData = JSON.parse(resultText);
-
-                    if (taskData && taskData.data) {
-                        const taskStatus = taskData.data.status;
-
-                        if (taskStatus === "SUCCEEDED" || taskStatus === "success") {
-                            clearInterval(checkInterval);
-                            
-                            const videoUrl = taskData.data.result || taskData.data.videoUrl || taskData.data.video_url;
-
-                            statusContainer.innerHTML = `
-                                <p style="color:var(--success); font-weight:bold; margin-bottom:10px;">👑 كليبك جاهز ومبروك عليك يا بطل!</p>
-                                <video controls autoplay style="width:100%; border-radius:8px; border:1px solid #444; max-height:410px; background:#000;">
-                                    <source src="${videoUrl}" type="video/mp4">
-                                </video>
-                                <a href="${videoUrl}" target="_blank" style="display:block; text-align:center; background:var(--success); color:white; padding:10px; border-radius:8px; margin-top:10px; text-decoration:none; font-weight:bold;"><i class="fa-solid fa-download"></i> تحميل الفيديو فوراً</a>
-                            `;
-                        } 
-                        else if (taskStatus === "FAILED" || taskStatus === "failed") {
-                            clearInterval(checkInterval);
-                            statusContainer.innerHTML = `<p style="color:var(--danger); font-weight:bold;">❌ السيرفر فشل في إتمام التوليد النهائي للمشهد.</p>`;
-                        } 
-                        else {
-                            statusText.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin" style="color:var(--primary)"></i> السيرفر يقوم بتركيب تأثيرات الـ 10 ثوانٍ حالياً... جاري المتابعة تلقائياً.`;
-                        }
-                    }
-                } catch (err) {
-                    console.error("خطأ معالجة الفحص الدوري:", err);
-                }
-            }, 15000); // يفحص كل 15 ثانية تلقائياً لحين الجاهزية
-        }
-    </script>
+    // Initial Render
+    applySiteSettings();
+    renderPlans();
+    updateAdvisor();
+    lucide.createIcons();
+  </script>
 </body>
 </html>
